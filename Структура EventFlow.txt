@@ -1,0 +1,325 @@
+
+C:.
+│   .dockerignore
+│   EventFlow.slnx
+│
+├───EventFlow.API
+│   │   appsettings.Development.json
+│   │   appsettings.json
+│   │   EventFlow.API.csproj
+│   │   EventFlow.API.http
+│   │   Program.cs
+│   │
+│   ├───bin
+│   │   └───Debug
+│   │       └───net10.0
+│   │               appsettings.Development.json
+│   │               appsettings.json
+│   │               AutoMapper.dll
+│   │               EventFlow.API.deps.json
+│   │               EventFlow.API.dll
+│   │               EventFlow.API.exe
+│   │               EventFlow.API.pdb
+│   │               EventFlow.API.runtimeconfig.json
+│   │               EventFlow.API.staticwebassets.endpoints.json
+│   │               EventFlow.Application.dll
+│   │               EventFlow.Application.pdb
+│   │               EventFlow.Domain.dll
+│   │               EventFlow.Domain.pdb
+│   │               EventFlow.Infrastructure.dll
+│   │               EventFlow.Infrastructure.pdb
+│   │               FluentValidation.dll
+│   │               Microsoft.AspNetCore.Authentication.JwtBearer.dll
+│   │               Microsoft.EntityFrameworkCore.Abstractions.dll
+│   │               Microsoft.EntityFrameworkCore.dll
+│   │               Microsoft.EntityFrameworkCore.Relational.dll
+│   │               Microsoft.IdentityModel.Abstractions.dll
+│   │               Microsoft.IdentityModel.JsonWebTokens.dll
+│   │               Microsoft.IdentityModel.Logging.dll
+│   │               Microsoft.IdentityModel.Protocols.dll
+│   │               Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+│   │               Microsoft.IdentityModel.Tokens.dll
+│   │               Microsoft.OpenApi.dll
+│   │               Npgsql.dll
+│   │               Npgsql.EntityFrameworkCore.PostgreSQL.dll
+│   │               Swashbuckle.AspNetCore.Swagger.dll
+│   │               Swashbuckle.AspNetCore.SwaggerGen.dll
+│   │               Swashbuckle.AspNetCore.SwaggerUI.dll
+│   │               System.IdentityModel.Tokens.Jwt.dll
+│   │
+│   ├───Controllers
+│   │       BaseController.cs
+│   │
+│   ├───Extensions
+│   ├───Filters
+│   ├───Middleware
+│   ├───obj
+│   │   │   EventFlow.API.csproj.nuget.dgspec.json
+│   │   │   EventFlow.API.csproj.nuget.g.props
+│   │   │   EventFlow.API.csproj.nuget.g.targets
+│   │   │   project.assets.json
+│   │   │   project.nuget.cache
+│   │   │
+│   │   └───Debug
+│   │       └───net10.0
+│   │           │   .NETCoreApp,Version=v10.0.AssemblyAttributes.cs
+│   │           │   ApiEndpoints.json
+│   │           │   apphost.exe
+│   │           │   EventFlo.C475C285.Up2Date
+│   │           │   EventFlow.API.AssemblyInfo.cs
+│   │           │   EventFlow.API.AssemblyInfoInputs.cache
+│   │           │   EventFlow.API.assets.cache
+│   │           │   EventFlow.API.csproj.AssemblyReference.cache
+│   │           │   EventFlow.API.csproj.CoreCompileInputs.cache
+│   │           │   EventFlow.API.csproj.FileListAbsolute.txt
+│   │           │   EventFlow.API.dll
+│   │           │   EventFlow.API.GeneratedMSBuildEditorConfig.editorconfig
+│   │           │   EventFlow.API.genruntimeconfig.cache
+│   │           │   EventFlow.API.GlobalUsings.g.cs
+│   │           │   EventFlow.API.MvcApplicationPartsAssemblyInfo.cache
+│   │           │   EventFlow.API.MvcApplicationPartsAssemblyInfo.cs
+│   │           │   EventFlow.API.pdb
+│   │           │   EventFlow.API.sourcelink.json
+│   │           │   ip1snkdo.5mp~
+│   │           │   rjsmcshtml.dswa.cache.json
+│   │           │   rjsmrazor.dswa.cache.json
+│   │           │   rpswa.dswa.cache.json
+│   │           │   staticwebassets.build.endpoints.json
+│   │           │   staticwebassets.build.json
+│   │           │   staticwebassets.build.json.cache
+│   │           │   staticwebassets.references.upToDateCheck.txt
+│   │           │   staticwebassets.removed.txt
+│   │           │   swae.build.ex.cache
+│   │           │
+│   │           ├───EndpointInfo
+│   │           │       EventFlow.API.json
+│   │           │       EventFlow.API.OpenApiFiles.cache
+│   │           │
+│   │           ├───ref
+│   │           │       EventFlow.API.dll
+│   │           │
+│   │           ├───refint
+│   │           │       EventFlow.API.dll
+│   │           │
+│   │           └───staticwebassets
+│   └───Properties
+│           launchSettings.json
+│
+├───EventFlow.Application
+│   │   EventFlow.Application.csproj
+│   │
+│   ├───bin
+│   │   └───Debug
+│   │       └───net10.0
+│   │               EventFlow.Application.deps.json
+│   │               EventFlow.Application.dll
+│   │               EventFlow.Application.pdb
+│   │               EventFlow.Domain.dll
+│   │               EventFlow.Domain.pdb
+│   │
+│   ├───DTOs
+│   │       CreateEventDto.cs
+│   │       EventDto.cs
+│   │       OrganizerDto.cs
+│   │       RegistrationDto.cs
+│   │       UpdateEventDto.cs
+│   │       UserDto.cs
+│   │
+│   ├───Interfaces
+│   │       IEventRepository.cs
+│   │       IEventService.cs
+│   │       IOrganizerRepository.cs
+│   │       IRegistrationRepository.cs
+│   │       IRegistrationService.cs
+│   │       IUnitOfWork.cs
+│   │       IUserRepository.cs
+│   │
+│   ├───Mappings
+│   ├───obj
+│   │   │   EventFlow.Application.csproj.nuget.dgspec.json
+│   │   │   EventFlow.Application.csproj.nuget.g.props
+│   │   │   EventFlow.Application.csproj.nuget.g.targets
+│   │   │   project.assets.json
+│   │   │   project.nuget.cache
+│   │   │
+│   │   └───Debug
+│   │       ├───net10.0
+│   │       │   │   .NETCoreApp,Version=v10.0.AssemblyAttributes.cs
+│   │       │   │   EventFlo.EF32E471.Up2Date
+│   │       │   │   EventFlow.Application.AssemblyInfo.cs
+│   │       │   │   EventFlow.Application.AssemblyInfoInputs.cache
+│   │       │   │   EventFlow.Application.assets.cache
+│   │       │   │   EventFlow.Application.csproj.AssemblyReference.cache
+│   │       │   │   EventFlow.Application.csproj.CoreCompileInputs.cache
+│   │       │   │   EventFlow.Application.csproj.FileListAbsolute.txt
+│   │       │   │   EventFlow.Application.dll
+│   │       │   │   EventFlow.Application.GeneratedMSBuildEditorConfig.editorconfig
+│   │       │   │   EventFlow.Application.GlobalUsings.g.cs
+│   │       │   │   EventFlow.Application.pdb
+│   │       │   │   EventFlow.Application.sourcelink.json
+│   │       │   │
+│   │       │   ├───ref
+│   │       │   │       EventFlow.Application.dll
+│   │       │   │
+│   │       │   └───refint
+│   │       │           EventFlow.Application.dll
+│   │       │
+│   │       └───net8.0
+│   │           │   .NETCoreApp,Version=v8.0.AssemblyAttributes.cs
+│   │           │   EventFlow.Application.AssemblyInfo.cs
+│   │           │   EventFlow.Application.AssemblyInfoInputs.cache
+│   │           │   EventFlow.Application.GeneratedMSBuildEditorConfig.editorconfig
+│   │           │   EventFlow.Application.GlobalUsings.g.cs
+│   │           │
+│   │           └───refint
+│   ├───Services
+│   └───Validators
+├───EventFlow.Domain
+│   │   EventFlow.Domain.csproj
+│   │
+│   ├───bin
+│   │   └───Debug
+│   │       └───net10.0
+│   │               EventFlow.Domain.deps.json
+│   │               EventFlow.Domain.dll
+│   │               EventFlow.Domain.pdb
+│   │
+│   ├───Common
+│   │       BaseEntity.cs
+│   │
+│   ├───Entities
+│   │       Event.cs
+│   │       Organizer.cs
+│   │       Registration.cs
+│   │       User.cs
+│   │
+│   ├───Enums
+│   │       EventStatus.cs
+│   │       EventType.cs
+│   │       RegistrationStatus.cs
+│   │       UserRole.cs
+│   │
+│   ├───Exceptions
+│   │       DomainException.cs
+│   │
+│   └───obj
+│       │   EventFlow.Domain.csproj.nuget.dgspec.json
+│       │   EventFlow.Domain.csproj.nuget.g.props
+│       │   EventFlow.Domain.csproj.nuget.g.targets
+│       │   project.assets.json
+│       │   project.nuget.cache
+│       │
+│       └───Debug
+│           ├───net10.0
+│           │   │   .NETCoreApp,Version=v10.0.AssemblyAttributes.cs
+│           │   │   EventFlow.Domain.AssemblyInfo.cs
+│           │   │   EventFlow.Domain.AssemblyInfoInputs.cache
+│           │   │   EventFlow.Domain.assets.cache
+│           │   │   EventFlow.Domain.csproj.CoreCompileInputs.cache
+│           │   │   EventFlow.Domain.csproj.FileListAbsolute.txt
+│           │   │   EventFlow.Domain.dll
+│           │   │   EventFlow.Domain.GeneratedMSBuildEditorConfig.editorconfig
+│           │   │   EventFlow.Domain.GlobalUsings.g.cs
+│           │   │   EventFlow.Domain.pdb
+│           │   │   EventFlow.Domain.sourcelink.json
+│           │   │
+│           │   ├───ref
+│           │   │       EventFlow.Domain.dll
+│           │   │
+│           │   └───refint
+│           │           EventFlow.Domain.dll
+│           │
+│           └───net8.0
+│               │   .NETCoreApp,Version=v8.0.AssemblyAttributes.cs
+│               │   EventFlow.Domain.AssemblyInfo.cs
+│               │   EventFlow.Domain.AssemblyInfoInputs.cache
+│               │   EventFlow.Domain.GeneratedMSBuildEditorConfig.editorconfig
+│               │   EventFlow.Domain.GlobalUsings.g.cs
+│               │
+│               └───refint
+└───EventFlow.Infrastructure
+    │   EventFlow.Infrastructure.csproj
+    │
+    ├───bin
+    │   └───Debug
+    │       └───net10.0
+    │               EventFlow.Application.dll
+    │               EventFlow.Application.pdb
+    │               EventFlow.Domain.dll
+    │               EventFlow.Domain.pdb
+    │               EventFlow.Infrastructure.deps.json
+    │               EventFlow.Infrastructure.dll
+    │               EventFlow.Infrastructure.pdb
+    │               EventFlow.Infrastructure.runtimeconfig.json
+    │
+    ├───Configurations
+    ├───Data
+    │       ApplicationDbContext.cs
+    │
+    ├───Migrations
+    ├───obj
+    │   │   EventFlow.Infrastructure.csproj.nuget.dgspec.json
+    │   │   EventFlow.Infrastructure.csproj.nuget.g.props
+    │   │   EventFlow.Infrastructure.csproj.nuget.g.targets
+    │   │   project.assets.json
+    │   │   project.nuget.cache
+    │   │
+    │   └───Debug
+    │       └───net10.0
+    │           │   .NETCoreApp,Version=v10.0.AssemblyAttributes.cs
+    │           │   EventFlo.F1331CBB.Up2Date
+    │           │   EventFlow.Infrastructure.AssemblyInfo.cs
+    │           │   EventFlow.Infrastructure.AssemblyInfoInputs.cache
+    │           │   EventFlow.Infrastructure.assets.cache
+    │           │   EventFlow.Infrastructure.csproj.AssemblyReference.cache
+    │           │   EventFlow.Infrastructure.csproj.CoreCompileInputs.cache
+    │           │   EventFlow.Infrastructure.csproj.FileListAbsolute.txt
+    │           │   EventFlow.Infrastructure.dll
+    │           │   EventFlow.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+    │           │   EventFlow.Infrastructure.genruntimeconfig.cache
+    │           │   EventFlow.Infrastructure.GlobalUsings.g.cs
+    │           │   EventFlow.Infrastructure.pdb
+    │           │   EventFlow.Infrastructure.sourcelink.json
+    │           │
+    │           ├───ref
+    │           │       EventFlow.Infrastructure.dll
+    │           │
+    │           └───refint
+    │                   EventFlow.Infrastructure.dll
+    │
+    ├───Repositories
+    │       BaseRepository.cs
+    │       UnitOfWork.cs
+    │
+    └───Services
+	
+
+
+
+  ЗАПОЛНЕНО ✅                                                  
+
+  Domain:        Entities (4), Enums (4), Common (1), Exceptions (1) 
+  Application:   Interfaces (7), DTOs (6)                        
+  Infrastructure: Data (1), Repositories (2)                      
+  API:           Controllers (1 - BaseController)                 
+
+
+
+  НУЖНО ЗАПОЛНИТЬ                                        
+
+  Infrastructure:                                                 
+    - Configurations (4 файла) ← КОНФИГУРАЦИИ EF CORE             
+    - Repositories (4 файла)   ← РЕАЛИЗАЦИИ РЕПОЗИТОРИЕВ          
+    - Services (2 файла)       ← ВНЕШНИЕ СЕРВИСЫ                  
+    - Migrations (авто)        ← МИГРАЦИИ БД                      
+                                                                  
+  Application:                                                    
+    - Services (4 файла)       ← БИЗНЕС-ЛОГИКА                    
+    - Validators (4 файла)     ← ВАЛИДАЦИЯ DTO                    
+    - Mappings (1 файл)        ← AUTO MAPPER ПРОФИЛИ              
+                                                                  
+  API:                                                            
+    - Controllers (4 файла)    ← REST ENDPOINTS                   
+    - Middleware (2 файла)     ← ОБРАБОТКА ОШИБОК                 
+    - Extensions (1 файл)      ← РЕГИСТРАЦИЯ DI                   
+    - Filters (1 файл)         ← ВАЛИДАЦИЯ ЗАПРОСОВ               
