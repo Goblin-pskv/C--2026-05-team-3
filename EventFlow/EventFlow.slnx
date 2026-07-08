@@ -1,6 +1,6 @@
 <Solution>
-  <Project Path="EventFlow.API/EventFlow.API.csproj" />
+  <Project Path="EventFlow.API/EventFlow.API.csproj" Id="1c98904a-afff-454b-af5b-75e62316e438" />
   <Project Path="EventFlow.Application/EventFlow.Application.csproj" />
   <Project Path="EventFlow.Domain/EventFlow.Domain.csproj" />
-  <Project Path="EventFlow.Infrastructure/EventFlow.Infrastructure.csproj" />
+  <Project Path="EventFlow.Infrastructure/EventFlow.Infrastructure.csproj" Id="4919c5d5-8305-45ae-8759-308a2b535a7b" />
 </Solution>

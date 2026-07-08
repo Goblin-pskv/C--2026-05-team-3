@@ -22,7 +22,7 @@ namespace EventFlow.Domain.Entities
     /// - Одна Registration принадлежит одному User (N:1)
     /// - Уникальное ограничение: один User = одна Registration на Event
     /// </summary>
-    internal class Registration : BaseEntity
+    public class Registration : BaseEntity
     {
         /// <summary>
         /// ID мероприятия, на которое регистрируется пользователь.
