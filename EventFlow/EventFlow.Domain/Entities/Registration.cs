@@ -92,7 +92,7 @@ namespace EventFlow.Domain.Entities
             if (Status == RegistrationStatus.Attended)
                 throw new DomainException("Нельзя отменить посещенное мероприятие");
 
-            Status = RegistrationStatus.Cancelled;         
+            Status = RegistrationStatus.Cancelled;
         }
 
         public void MardAsAttended()

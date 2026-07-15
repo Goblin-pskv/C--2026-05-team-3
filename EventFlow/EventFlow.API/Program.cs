@@ -1,4 +1,7 @@
-using EventFlow.Infrastructure.Services;
+using EventFlow.Application.Commands.RegisterCommand;
+using EventFlow.Application.Interfaces;
+using EventFlow.Infrastructure.Repositories;
+using FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,13 +11,11 @@ builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddMediatR(msc => msc.RegisterServicesFromAssembly(typeof(RegisterUserCommand).Assembly));
+builder.Services.AddValidatorsFromAssembly(typeof(RegisterUserCommand).Assembly);
+builder.Services.AddScoped<IUserRepository, InMemoryUserRepository>();
 
 var app = builder.Build();
-
-// JWT
-var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
-
-builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

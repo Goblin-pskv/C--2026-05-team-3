@@ -20,12 +20,12 @@ namespace EventFlow.Domain.Entities
         /// Название мероприятия        
         /// </summary>
         public string Title { get; set; } = string.Empty;
-        public string? Description { get; set; } 
-        public EventType Type { get; set;  }
-        public DateTime Start {  get; set; }
+        public string? Description { get; set; }
+        public EventType Type { get; set; }
+        public DateTime Start { get; set; }
         public DateTime End { get; set; }
         public string City { get; set; } = string.Empty;
-        public string Address {  get; set; } = string.Empty;
+        public string Address { get; set; } = string.Empty;
         public decimal Price { get; set; } = 0;
 
         public int? MaxParticipants { get; set; }
