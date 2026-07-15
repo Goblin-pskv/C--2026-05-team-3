@@ -20,7 +20,7 @@ namespace EventFlow.Application.Commands.RegisterCommand
             var validationResult = await _validator.ValidateAsync(request, ct);
             if (!validationResult.IsValid)
                 return Result.Failure(validationResult.Errors.First().ErrorMessage);
-            if (await _userRepository.GetByEmailAsync(request.Email) == null)
+            if (await _userRepository.GetByEmailAsync(request.Email) != null)
                 return Result.Failure("Email занят");
             var user = new User(request.FirstName, request.LastName, request.Email, request.PasswordHash);
             await _userRepository.AddAsync(user);

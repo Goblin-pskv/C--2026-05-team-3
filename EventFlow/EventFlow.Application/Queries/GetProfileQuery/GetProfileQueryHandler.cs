@@ -6,17 +6,15 @@ using MediatR;
 
 namespace EventFlow.Application.Queries.GetProfileQuery
 {
-    public class GetProfileQueryHandler : IRequestHandler<GetProfileQuery, Result>
+    public class GetProfileQueryHandler : IRequestHandler<GetProfileQuery, Result<UserDto>>
     {
         private readonly IUserRepository _userRepository;
-        private readonly IValidator<GetProfileQuery> _validator;
 
-        public GetProfileQueryHandler(IUserRepository userRepository, IValidator<GetProfileQuery> validator)
+        public GetProfileQueryHandler(IUserRepository userRepository)
         {
             _userRepository = userRepository;
-            _validator = validator;
         }
-        public async Task<Result> Handle(GetProfileQuery request, CancellationToken cancellationToken)
+        public async Task<Result<UserDto>> Handle(GetProfileQuery request, CancellationToken cancellationToken)
         {//В методах нужно будет дописать в параметры токен, как только изменят методы
             var user = await _userRepository.GetByIdAsync(request.UserId);
             if (user == null)
