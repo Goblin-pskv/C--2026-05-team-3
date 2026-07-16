@@ -41,7 +41,7 @@ namespace EventFlow.Domain.Entities
         /// Навигационное свойство для EF Core.
         /// Связь: один Organizer принадлежит одному User (1:1)
         /// </summary>
-        public virtual User user { get; set; } = null!;
+        public virtual User User { get; set; } = null!;
         /// <summary>
         /// Список всех мероприятий, созданных этим организатором.
         /// Показывает, какие мероприятия организовал этот человек/компания.
