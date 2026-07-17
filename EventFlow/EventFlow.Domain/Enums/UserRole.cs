@@ -9,10 +9,10 @@ namespace EventFlow.Domain.Enums
     /// Определяет права доступа:
     /// - Participant: может регистрироваться на мероприятия
     /// - Organizer: может создавать и управлять мероприятиями
+    /// 
     public enum UserRole
     {
-        User = 0,
-        Organizer = 1,
-        Admin = 2
+        Participant = 0,
+        Organizer = 1
     }
 }

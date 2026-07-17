@@ -79,12 +79,13 @@ namespace EventFlow.Infrastructure.Data
                 {
                     case EntityState.Added:
                         // Новая сущность — устанавливаем обе даты
-                        entry.Entity.SetTimestamps(now);
+                        entry.Entity.CreatedAt = now;
+                        entry.Entity.UpdatedAt = now;
                         break;
 
                     case EntityState.Modified:
                         // Измененная сущность — обновляем только UpdatedAt
-                        entry.Entity.MarkAsUpdated(now);
+                        entry.Entity.UpdatedAt = now;
                         // CreatedAt не трогаем — это дата создания
                         break;
                 }
