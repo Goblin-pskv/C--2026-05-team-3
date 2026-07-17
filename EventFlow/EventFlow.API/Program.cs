@@ -1,8 +1,3 @@
-using EventFlow.Application.Commands.RegisterCommand;
-using EventFlow.Application.Interfaces;
-using EventFlow.Infrastructure.Repositories;
-using FluentValidation;
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -11,9 +6,6 @@ builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddMediatR(msc => msc.RegisterServicesFromAssembly(typeof(RegisterUserCommand).Assembly));
-builder.Services.AddValidatorsFromAssembly(typeof(RegisterUserCommand).Assembly);
-builder.Services.AddScoped<IUserRepository, InMemoryUserRepository>();
 
 var app = builder.Build();
 

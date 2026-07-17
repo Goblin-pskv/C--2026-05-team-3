@@ -25,75 +25,28 @@ namespace EventFlow.Domain.Entities
     public class Registration : BaseEntity
     {
         /// <summary>
-        /// Конструктор для бизнес создания модели
-        /// </summary>
-        /// <param name="eventId"></param>
-        /// <param name="userId"></param>
-        /// <param name="status"></param>
-        /// <param name="eventReg"></param>
-        /// <param name="user"></param>
-        /// <exception cref="DomainException"></exception>
-        public Registration(Guid eventId, Guid userId, Event @event, User user) 
-            : base(Guid.NewGuid(), DateTime.UtcNow, DateTime.UtcNow)
-        {
-            EventId = eventId;
-            UserId = userId;
-            Status = RegistrationStatus.Pending;
-            RegistrationDate = DateTime.UtcNow;
-            ConfirmationDate = null;
-            Event = @event ?? throw new DomainException($"Null у параметра {nameof(@event)}");
-            User = user ?? throw new DomainException($"Null у параметра {nameof(user)}");
-        }
-        /// <summary>
-        /// Конструктор для EF Core
-        /// </summary>
-        /// <param name="registrationId"></param>
-        /// <param name="createdAt"></param>
-        /// <param name="updatedAt"></param>
-        /// <param name="eventId"></param>
-        /// <param name="userId"></param>
-        /// <param name="status"></param>
-        /// <param name="registrationDate"></param>
-        /// <param name="confirmationDate"></param>
-        /// <param name="event"></param>
-        /// <param name="user"></param>
-        private Registration(Guid registrationId, DateTime createdAt, DateTime updatedAt, Guid eventId, 
-            Guid userId, RegistrationStatus status, DateTime registrationDate, DateTime? confirmationDate, 
-            Event @event, User user) 
-            : base(registrationId, createdAt, updatedAt)
-        {
-            EventId = eventId;
-            UserId = userId;
-            Status = status;
-            RegistrationDate = registrationDate;
-            ConfirmationDate = confirmationDate;
-            Event = @event;
-            User = user;
-        }
-
-        /// <summary>
         /// ID мероприятия, на которое регистрируется пользователь.
         /// Внешний ключ на таблицу Events.
         /// </summary>
-        public Guid EventId { get; private set; }
+        public Guid EventId { get; set; }
 
         /// <summary>
         /// ID пользователя, который регистрируется.
         /// Внешний ключ на таблицу Users.
         /// </summary>
-        public Guid UserId { get; private set; }
+        public Guid UserId { get; set; }
 
         /// <summary>
         /// Статус регистрации.
         /// Определяет, на каком этапе находится запись.
         /// </summary>
-        public RegistrationStatus Status { get; private set; }
+        public RegistrationStatus Status { get; set; } = RegistrationStatus.Confirmed;
 
         /// <summary>
         /// Дата и время создания регистрации (в UTC).
         /// Заполняется автоматически при создании.      
         /// </summary>
-        public DateTime RegistrationDate { get; private set; }
+        public DateTime RegistrationDate { get; set; } = DateTime.UtcNow;
 
 
         /// <summary>
@@ -101,7 +54,7 @@ namespace EventFlow.Domain.Entities
         /// NULL если еще не подтверждена.
         /// Заполняется при переходе в статус Confirmed.        
         /// </summary>
-        public DateTime? ConfirmationDate { get; private set; }
+        public DateTime? ConfirmationDate { get; set; }
 
 
         /// <summary>
@@ -109,9 +62,9 @@ namespace EventFlow.Domain.Entities
         /// Навигационное свойство для EF Core.
         /// Связь: одна Registration принадлежит одному Event (N:1)
         /// </summary>
-        public Event Event { get; private set; }
+        public virtual Event Event { get; set; } = null!;
 
-        public User User { get; private set; }
+        public virtual User User { get; set; } = null!;
 
 
         /// <summary>

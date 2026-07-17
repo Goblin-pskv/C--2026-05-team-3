@@ -10,22 +10,10 @@ namespace EventFlow.Domain.Common
     /// </summary>
     public abstract class BaseEntity
     {
-        public BaseEntity(Guid id, DateTime createdAt, DateTime updatedAt)
-        {
-            Id = id;
-        }
+        public Guid Id { get; set; }
+        public DateTime CreatedAt { get; set; }
 
-        public Guid Id { get; init; }
-        public DateTime CreatedAt { get; private set; }
-        public DateTime UpdatedAt { get; private set; }
-        public void SetTimestamps(DateTime date)
-        {
-            CreatedAt = date;
-            UpdatedAt = date;
-        }
-        public void MarkAsUpdated(DateTime date)
-        {
-            UpdatedAt = date;
-        }
+        public DateTime UpdatedAt { get; set; }
+
     }
 }
