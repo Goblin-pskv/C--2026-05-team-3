@@ -1,5 +1,7 @@
 ﻿using EventFlow.Domain.Common;
 using EventFlow.Domain.Entities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -26,14 +28,11 @@ namespace EventFlow.Infrastructure.Data
     /// - DbSet<T> — это коллекция сущностей типа T в БД
     /// - После изменений нужно вызвать SaveChangesAsync() для COMMIT
     /// </summary>
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
-        }
-
-        /// <summary>Таблица пользователей в БД</summary>
-        public DbSet<User> Users => Set<User>();
+        }        
 
         /// <summary>Таблица профилей организаторов</summary>
         public DbSet<Organizer> Organizers => Set<Organizer>();
