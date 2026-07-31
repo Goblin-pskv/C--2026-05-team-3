@@ -26,7 +26,7 @@ namespace EventFlow.Infrastructure.Repositories
     /// - Должен быть ссылочным типом (class)
     /// </summary>
     /// <typeparam name="T">Тип сущности (Event, User, Organizer, Registration)</typeparam>
-    public class BaseRepository<T> : IRepository<T> where T: BaseEntity, IDisposable
+    public class BaseRepository<T> : IRepository<T> where T: BaseEntity
     {
         /// <summary>
         /// Контекст базы данных.
@@ -57,9 +57,9 @@ namespace EventFlow.Infrastructure.Repositories
         /// </summary>
         /// <param name="id">UUID сущности</param>
         /// <returns>Сущность или null, если не найдена</returns>
-        public virtual async Task<T?> GetByIdAsync(Guid id)
+        public virtual async Task<T?> GetByIdAsync(Guid id, CancellationToken ct)
         {
-            return await _dbSet.FindAsync(id);
+            return await _dbSet.FindAsync(new object[] { id }, ct);
 
         }
 
@@ -68,9 +68,9 @@ namespace EventFlow.Infrastructure.Repositories
         /// Осторожно: может вернуть много данных. Используйте с фильтрацией.
         /// </summary>
         /// <returns>Список всех сущностей</returns>
-        public Task<IEnumerable<T>> GetAllAsync()
+        public async Task<IEnumerable<T>> GetAllAsync(CancellationToken ct)
         {
-            return Task.FromResult(_dbSet.AsEnumerable());
+            return await _dbSet.ToListAsync(ct);
         }
 
         /// <summary>
@@ -80,11 +80,9 @@ namespace EventFlow.Infrastructure.Repositories
         /// <param name="entity">Сущность для добавления</param>
         /// Метод возвращает Task (он асинхронный для вызывающего кода), 
         /// но внутри себя он не тратит ресурсы на лишний await
-        public virtual Task AddAsync(T entity)
+        public async virtual Task AddAsync(T entity, CancellationToken ct)
         {
-            _dbSet.Add(entity);
-
-            return Task.CompletedTask;
+            await _dbSet.AddAsync(entity,ct);
         }
 
         /// <summary>
@@ -94,11 +92,9 @@ namespace EventFlow.Infrastructure.Repositories
         /// <param name="entities">Коллекция сущностей</param>
         /// Метод возвращает Task (он асинхронный для вызывающего кода), 
         /// но внутри себя он не тратит ресурсы на лишний await
-        public virtual Task AddRangeAsync(IEnumerable<T> entities)
+        public async virtual Task AddRangeAsync(IEnumerable<T> entities, CancellationToken ct)
         {
-            _dbSet.AddRange(entities);
-
-            return Task.CompletedTask;
+            await _dbSet.AddRangeAsync(entities, ct);
         }
 
         /// <summary>
@@ -107,18 +103,16 @@ namespace EventFlow.Infrastructure.Repositories
         /// сущностей нужно явно вызвать Update.
         /// </summary>
         /// <param name="entity">Сущность с измененными данными</param>
-        public async Task UpdateAsync(T entity)
+        public void UpdateAsync(T entity, CancellationToken ct)
         {
             _dbSet.Update(entity);
-
-            await Task.CompletedTask;
         }
 
         /// <summary>
         /// Удалить сущность.
         /// </summary>
         /// <param name="entity">Сущность для удаления</param>
-        public virtual void Delete(T entity)
+        public virtual void Delete(T entity, CancellationToken ct)
         {
             _dbSet.Remove(entity);
         }
@@ -128,12 +122,12 @@ namespace EventFlow.Infrastructure.Repositories
         /// Удобно, когда не нужно загружать сущность перед удалением.
         /// </summary>
         /// <param name="id">UUID сущности</param>
-        public async Task DeleteAsync(Guid id)
+        public async Task DeleteAsync(Guid id, CancellationToken ct)
         {
-            var entity = await GetByIdAsync(id);
+            var entity = await GetByIdAsync(id, ct);
             if (entity != null)
             {
-                Delete(entity);
+                Delete(entity, ct);
             }
         }
 
@@ -142,21 +136,9 @@ namespace EventFlow.Infrastructure.Repositories
         /// Выполняет COMMIT транзакции.
         /// </summary>
         /// <returns>Количество измененных записей</returns>
-        public async Task<int> SaveChangesAsync()
+        public async Task<int> SaveChangesAsync(CancellationToken ct)
         {
-            return await _context.SaveChangesAsync();
+            return await _context.SaveChangesAsync(ct);
         }
-
-        /// <summary>
-        /// Освобождение ресурсов (паттерн IDisposable).
-        /// DbContext освобождается автоматически через DI,
-        /// но этот метод нужен для явного управления.
-        /// </summary>
-        public void Dispose()
-        {
-            _context.Dispose();
-            GC.SuppressFinalize(this); 
-        }
-
     }
 }

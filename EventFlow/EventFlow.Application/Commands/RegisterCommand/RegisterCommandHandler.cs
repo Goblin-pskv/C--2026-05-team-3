@@ -8,11 +8,11 @@ namespace EventFlow.Application.Commands.RegisterCommand
 {
     public class RegisterCommandHandler : IRequestHandler<RegisterUserCommand, Result>
     {
-        private readonly IUserRepository _userRepository;
+        private readonly IRepository<User> _repository;
         private readonly IValidator<RegisterUserCommand> _validator;
-        public RegisterCommandHandler(IUserRepository userRepository, IValidator<RegisterUserCommand> validator)
+        public RegisterCommandHandler(IRepository<User> repository, IValidator<RegisterUserCommand> validator)
         {
-            _userRepository = userRepository;
+            _repository = repository;
             _validator = validator;
         }
         public async Task<Result> Handle(RegisterUserCommand request, CancellationToken ct)
@@ -20,11 +20,14 @@ namespace EventFlow.Application.Commands.RegisterCommand
             var validationResult = await _validator.ValidateAsync(request, ct);
             if (!validationResult.IsValid)
                 return Result.Failure(validationResult.Errors.First().ErrorMessage);
-            if (await _userRepository.GetByEmailAsync(request.Email) != null)
-                return Result.Failure("Email занят");
+            //if (await _repository.GetByEmailAsync(request.Email) != null)
+            //    return Result.Failure("Email занят");
             var user = new User();
-            await _userRepository.AddAsync(user);
-            await _userRepository.SaveChangesAsync();
+            user.FirstName = request.FirstName;
+            user.LastName = request.LastName;
+            user.Email = request.Email;
+            await _repository.AddAsync(user, ct);
+            await _repository.SaveChangesAsync(ct);
             return Result.Success();
         }
     }

@@ -89,6 +89,7 @@ namespace EventFlow.Infrastructure.Data
                 {
                     case EntityState.Added:
                         // Новая сущность — устанавливаем обе даты
+                        entry.Entity.Id = Guid.NewGuid();
                         entry.Entity.CreatedAt = now;
                         entry.Entity.UpdatedAt = now;
                         break;

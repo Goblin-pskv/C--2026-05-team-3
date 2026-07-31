@@ -1,5 +1,6 @@
 ﻿using EventFlow.Application.Common;
 using EventFlow.Application.Interfaces;
+using EventFlow.Domain.Entities;
 using FluentValidation;
 using MediatR;
 
@@ -7,12 +8,12 @@ namespace EventFlow.Application.Queries.LoginQuery
 {
     public class LoginQueryHandler : IRequestHandler<LoginQuery, Result<string>>
     {
-        private readonly IUserRepository _userRepository;
+        private readonly IRepository<User> _repository;
         private readonly IValidator<LoginQuery> _validator;
 
-        public LoginQueryHandler(IUserRepository userRepository, IValidator<LoginQuery> validator)
+        public LoginQueryHandler(IRepository<User> repository, IValidator<LoginQuery> validator)
         {
-            _userRepository = userRepository;
+            _repository = repository;
             _validator = validator;
         }
         public async Task<Result<string>> Handle(LoginQuery request, CancellationToken ct)
@@ -20,9 +21,9 @@ namespace EventFlow.Application.Queries.LoginQuery
             var validationResult = await _validator.ValidateAsync(request, ct);
             if (!validationResult.IsValid)
                 return Result<string>.Failure(validationResult.Errors.First().ErrorMessage);
-            var user = await _userRepository.GetByEmailAsync(request.Email);
-            if (user == null/* || !_passwordHasher.Verify(request.Password, user.PasswordHash)*/)
-                return Result<string>.Failure("Неверный Email или пароль");
+            //var user = await _repository.GetByEmailAsync(request.Email);
+            //if (user == null/* || !_passwordHasher.Verify(request.Password, user.PasswordHash)*/)
+            //    return Result<string>.Failure("Неверный Email или пароль");
             // замена на JWT позже. Нужно будет дописать проверку на пароль, когда появится hasher.
             var token = "fake-jwt-token";
             return Result<string>.Success(token);
