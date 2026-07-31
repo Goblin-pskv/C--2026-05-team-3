@@ -24,13 +24,13 @@ namespace EventFlow.Infrastructure.Data
     /// 5. Автоматически заполняет CreatedAt/UpdatedAt через override SaveChangesAsync
     /// 
     /// Как использовать:
-    /// - Внедряется через DI: public EventService(ApplicationDbContext context)
+    /// - Внедряется через DI: public EventService(EventFlowDbContext context)
     /// - DbSet<T> — это коллекция сущностей типа T в БД
     /// - После изменений нужно вызвать SaveChangesAsync() для COMMIT
     /// </summary>
-    public class ApplicationDbContext : DbContext
+    public class EventFlowDbContext : DbContext
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+        public EventFlowDbContext(DbContextOptions<EventFlowDbContext> options) : base(options)
         {
         }        
 
@@ -65,7 +65,7 @@ namespace EventFlow.Infrastructure.Data
 
             // Применяем все конфигурации из сборки Infrastructure
             // Автоматически находит все классы, реализующие IEntityTypeConfiguration<T>
-            modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(EventFlowDbContext).Assembly);
         }
 
         /// <summary>

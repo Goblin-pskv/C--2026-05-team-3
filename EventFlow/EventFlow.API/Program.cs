@@ -1,7 +1,9 @@
 using EventFlow.Application.Commands.RegisterCommand;
 using EventFlow.Application.Interfaces;
+using EventFlow.Infrastructure.Data;
 using EventFlow.Infrastructure.Repositories;
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +16,11 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddMediatR(msc => msc.RegisterServicesFromAssembly(typeof(RegisterUserCommand).Assembly));
 builder.Services.AddValidatorsFromAssembly(typeof(RegisterUserCommand).Assembly);
 builder.Services.AddScoped<IUserRepository, InMemoryUserRepository>();
+
+var connectionString = builder.Configuration.GetConnectionString("LocalPostgres");
+
+builder.Services.AddDbContext<EventFlowDbContext>(options =>
+    options.UseNpgsql(connectionString));
 
 var app = builder.Build();
 

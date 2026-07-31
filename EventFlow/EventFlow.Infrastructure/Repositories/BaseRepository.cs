@@ -32,7 +32,7 @@ namespace EventFlow.Infrastructure.Repositories
         /// Контекст базы данных.
         /// Protected, чтобы наследники могли использовать его для сложных запросов.
         /// </summary>
-        protected readonly ApplicationDbContext _context;
+        protected readonly EventFlowDbContext _context;
 
         /// <summary>
         /// DbSet для работы с сущностями типа T.
@@ -44,7 +44,7 @@ namespace EventFlow.Infrastructure.Repositories
         /// Конструктор базового репозитория.
         /// </summary>
         /// <param name="context">Контекст БД (внедряется через DI)</param>
-        public BaseRepository(ApplicationDbContext context)
+        public BaseRepository(EventFlowDbContext context)
         {
             _context = context;
             _dbSet = context.Set<T>();
