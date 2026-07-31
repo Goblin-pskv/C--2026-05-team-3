@@ -28,20 +28,31 @@ namespace EventFlow.Infrastructure.Data
     /// - DbSet<T> — это коллекция сущностей типа T в БД
     /// - После изменений нужно вызвать SaveChangesAsync() для COMMIT
     /// </summary>
-    public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
+    public class ApplicationDbContext : DbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }        
 
-        /// <summary>Таблица профилей организаторов</summary>
-        public DbSet<Organizer> Organizers => Set<Organizer>();
+        /// <summary>
+        /// Пользователи сервиса регистации на мероприятия
+        /// </summary>
+        public DbSet<User> Users { get; set; }
 
-        /// <summary>Таблица мероприятий</summary>
-        public DbSet<Event> Events => Set<Event>();
+        /// <summary>
+        /// Организаторы мероприятий
+        /// </summary>
+        public DbSet<Organizer> Organizers { get; set; }
 
-        /// <summary>Таблица регистраций на мероприятия</summary>
-        public DbSet<Registration> Registrations => Set<Registration>();
+        /// <summary>
+        /// Список мероприятий
+        /// </summary>
+        public DbSet<Event> Events { get; set; }
+
+        /// <summary>
+        /// Список регистраций на мероприятия
+        /// </summary>
+        public DbSet<Registration> Registrations { get; set; }
 
         /// <summary>
         /// Настройка модели БД: таблицы, связи, индексы, ограничения.

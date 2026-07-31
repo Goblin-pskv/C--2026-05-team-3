@@ -1,4 +1,5 @@
-﻿using EventFlow.Domain.Common;
+﻿using EventFlow.Application.Interfaces;
+using EventFlow.Domain.Common;
 using EventFlow.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -25,7 +26,7 @@ namespace EventFlow.Infrastructure.Repositories
     /// - Должен быть ссылочным типом (class)
     /// </summary>
     /// <typeparam name="T">Тип сущности (Event, User, Organizer, Registration)</typeparam>
-    public class BaseRepository<T> : IDisposable where T : BaseEntity
+    public class BaseRepository<T> : IRepository<T> where T: BaseEntity, IDisposable
     {
         /// <summary>
         /// Контекст базы данных.
@@ -67,9 +68,9 @@ namespace EventFlow.Infrastructure.Repositories
         /// Осторожно: может вернуть много данных. Используйте с фильтрацией.
         /// </summary>
         /// <returns>Список всех сущностей</returns>
-        public virtual async Task<List<T>> GetAllAsync()
+        public Task<IEnumerable<T>> GetAllAsync()
         {
-            return await _dbSet.ToListAsync();
+            return Task.FromResult(_dbSet.AsEnumerable());
         }
 
         /// <summary>
@@ -106,9 +107,11 @@ namespace EventFlow.Infrastructure.Repositories
         /// сущностей нужно явно вызвать Update.
         /// </summary>
         /// <param name="entity">Сущность с измененными данными</param>
-        public virtual void Update(T entity)
+        public async Task UpdateAsync(T entity)
         {
             _dbSet.Update(entity);
+
+            await Task.CompletedTask;
         }
 
         /// <summary>
@@ -125,7 +128,7 @@ namespace EventFlow.Infrastructure.Repositories
         /// Удобно, когда не нужно загружать сущность перед удалением.
         /// </summary>
         /// <param name="id">UUID сущности</param>
-        public virtual async Task DeleteByIdAsync(Guid id)
+        public async Task DeleteAsync(Guid id)
         {
             var entity = await GetByIdAsync(id);
             if (entity != null)
@@ -139,7 +142,7 @@ namespace EventFlow.Infrastructure.Repositories
         /// Выполняет COMMIT транзакции.
         /// </summary>
         /// <returns>Количество измененных записей</returns>
-        public virtual async Task<int> SaveChangesAsync()
+        public async Task<int> SaveChangesAsync()
         {
             return await _context.SaveChangesAsync();
         }
