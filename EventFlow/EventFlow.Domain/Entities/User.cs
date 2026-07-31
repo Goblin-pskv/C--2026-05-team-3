@@ -19,7 +19,7 @@ namespace EventFlow.Domain.Entities
         public ICollection<Registration> Registrations { get; set; } = new List<Registration>();
         public string FullName => $"{FirstName} {LastName}";
 
-        public string Email { get; set; }
+        public string Email { get; set; } = string.Empty;
 
     }
 }
