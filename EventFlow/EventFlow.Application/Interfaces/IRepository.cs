@@ -6,14 +6,15 @@ namespace EventFlow.Application.Interfaces
 {
     public interface IRepository<T> where T: class
     {
-        Task<T?> GetByIdAsync(Guid id);
+        Task<T?> GetByIdAsync(Guid id, CancellationToken ct);
 
-        Task<IEnumerable<T>> GetAllAsync();
+        Task<IEnumerable<T>> GetAllAsync(CancellationToken ct);
 
-        Task AddAsync(T entity);
+        Task AddAsync(T entity, CancellationToken ct);
 
-        Task UpdateAsync(T item);
-
-        Task DeleteAsync(Guid id);
+        void UpdateAsync(T item, CancellationToken ct);
+        void Delete(T entity, CancellationToken ct);
+        Task DeleteAsync(Guid id, CancellationToken ct);
+        Task<int> SaveChangesAsync(CancellationToken ct);
     }
 }
