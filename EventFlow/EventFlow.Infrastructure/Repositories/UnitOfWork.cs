@@ -30,11 +30,11 @@ namespace EventFlow.Infrastructure.Repositories;
 /// </summary>
 public class UnitOfWork : IUnitOfWork
 {
-    private readonly ApplicationDbContext _context;
+    private readonly EventFlowDbContext _context;
     private IDbContextTransaction? _transaction;
     private bool _disposed;
 
-    public UnitOfWork(ApplicationDbContext context)
+    public UnitOfWork(EventFlowDbContext context)
     {
         _context = context;
     }

@@ -42,7 +42,7 @@ namespace EventFlow.Infrastructure.Services
 
 
 
-            // Берем ключ из appsettings.json и преобразуем в массив байтов
+            // Берем ключ из appsettings.json(user-secrets) и преобразуем в массив байтов
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
             // создаем подпись для токена
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -52,7 +52,7 @@ namespace EventFlow.Infrastructure.Services
                 issuer: _jwtSettings.Issuer,
                 audience: _jwtSettings.Audience,
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(_jwtSettings.TokenLifetimeMinutes),
+                expires: DateTime.UtcNow.AddMinutes(_jwtSettings.AccessTokenLifetimeMinutes),
                 signingCredentials: creds
 
                 );
