@@ -1,4 +1,5 @@
 ﻿using EventFlow.Application.Common;
+using EventFlow.Application.DTOs;
 using EventFlow.Application.Interfaces;
 using EventFlow.Domain.Entities;
 using FluentValidation;
@@ -6,27 +7,34 @@ using MediatR;
 
 namespace EventFlow.Application.Queries.LoginQuery
 {
-    public class LoginQueryHandler : IRequestHandler<LoginQuery, Result<string>>
+    public class LoginQueryHandler : IRequestHandler<LoginQuery, Result<AuthResponseDto>>
     {
-        private readonly IRepository<User> _repository;
+        private readonly IUserRepository _userRepository;
         private readonly IValidator<LoginQuery> _validator;
+        private readonly ITokenService _tokenService;
+        private readonly IRefreshTokenService _refreshiTokenService;
 
-        public LoginQueryHandler(IRepository<User> repository, IValidator<LoginQuery> validator)
+        public LoginQueryHandler(IUserRepository userRepository, IValidator<LoginQuery> validator, ITokenService tokenService, IRefreshTokenService refreshTokenService)
         {
-            _repository = repository;
+            _userRepository = userRepository;
             _validator = validator;
+            _tokenService = tokenService;
+            _refreshiTokenService = refreshTokenService;
         }
-        public async Task<Result<string>> Handle(LoginQuery request, CancellationToken ct)
-        {//В методах нужно будет дописать в параметры токен, как только изменят методы
+        public async Task<Result<AuthResponseDto>> Handle(LoginQuery request, CancellationToken ct)
+        {
             var validationResult = await _validator.ValidateAsync(request, ct);
             if (!validationResult.IsValid)
-                return Result<string>.Failure(validationResult.Errors.First().ErrorMessage);
-            //var user = await _repository.GetByEmailAsync(request.Email);
-            //if (user == null/* || !_passwordHasher.Verify(request.Password, user.PasswordHash)*/)
-            //    return Result<string>.Failure("Неверный Email или пароль");
-            // замена на JWT позже. Нужно будет дописать проверку на пароль, когда появится hasher.
-            var token = "fake-jwt-token";
-            return Result<string>.Success(token);
+                return Result<AuthResponseDto>.Failure(validationResult.Errors.First().ErrorMessage);
+            User? user = await _userRepository.GetByEmailAsync(request.Email);
+            if (user == null)
+                return Result<AuthResponseDto>.Failure("Пользователь с таким Email и пароль не найден");
+            if (!await _userRepository.CheckPasswordAsync(user, request.Password))
+                return Result<AuthResponseDto>.Failure("Пользователь с таким Email и пароль не найден");
+            string accessToken = "";//await _tokenService.GenerateTokenAsync(user);
+            string refreshToken = "";//await _refreshiTokenService.GenerateAndSaveRefreshTokenAsync(user.Id);
+            var response = new AuthResponseDto(accessToken, refreshToken, DateTime.UtcNow);
+            return Result<AuthResponseDto>.Success(response);
         }
     }
 }

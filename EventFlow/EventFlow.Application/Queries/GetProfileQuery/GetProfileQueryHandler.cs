@@ -16,21 +16,17 @@ namespace EventFlow.Application.Queries.GetProfileQuery
             _repository = repository;
         }
         public async Task<Result<UserDto>> Handle(GetProfileQuery request, CancellationToken ct)
-        {//В методах нужно будет дописать в параметры токен, как только изменят методы
+        {
             var user = await _repository.GetByIdAsync(request.UserId, ct);
             if (user == null)
                 return Result<UserDto>.Failure("Пользователь не найден");
             //нашёл Dto, но нет конструктора, поэтому тут ЗАГЛУШКА
-            //var dto = new UserDto(
-            //    user.Id,
-            //    user.FirstName,
-            //    user.LastName,
-            //    user.Email,
-            //    user.PhoneNumber,
-            //    user.FullName,
-            //    user.Role
-            //);
             var dto = new UserDto();
+            dto.FullName = user.FullName;
+            dto.FirstName = user.FirstName;
+            dto.LastName = user.LastName;
+            dto.Email = user.Email;
+            dto.PhoneNumber = user.PhoneNumber;
             return Result<UserDto>.Success(dto);
         }
     }

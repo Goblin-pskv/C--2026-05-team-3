@@ -1,11 +1,16 @@
 using EventFlow.Application.Commands.RegisterCommand;
 using EventFlow.Application.Commands.UpdateProfileCommand;
 using EventFlow.Application.Interfaces;
+using EventFlow.Application.Queries.GetProfileQuery;
+using EventFlow.Application.Queries.LoginQuery;
+using EventFlow.Domain.Entities;
 using EventFlow.Infrastructure.Data;
 using EventFlow.Infrastructure.Repositories;
 using EventFlow.Infrastructure.Services;
 using FluentValidation;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,9 +22,16 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddMediatR(msc => msc.RegisterServicesFromAssembly(typeof(RegisterUserCommand).Assembly));
 builder.Services.AddValidatorsFromAssembly(typeof(RegisterUserCommand).Assembly);
+builder.Services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
 builder.Services.AddScoped(typeof(IRepository<>), typeof(BaseRepository<>));
 builder.Services.AddScoped<RegisterCommandHandler>();
 builder.Services.AddScoped<UpdateProfileCommandHandler>();
+builder.Services.AddScoped<GetProfileQueryHandler>();
+builder.Services.AddScoped<LoginQueryHandler>();
+builder.Services.AddScoped<JwtSettings>();
+builder.Services.AddIdentity<User, IdentityRole<Guid>>().AddEntityFrameworkStores<EventFlowDbContext>().AddDefaultTokenProviders();
+builder.Services.AddScoped(typeof(ITokenService), typeof(TokenService));
+builder.Services.AddScoped(typeof(IRefreshTokenService), typeof(RefreshTokenService));
 // JWT
 var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
 

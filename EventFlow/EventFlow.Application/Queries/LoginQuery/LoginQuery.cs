@@ -1,4 +1,5 @@
 ﻿using EventFlow.Application.Common;
+using EventFlow.Application.DTOs;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -10,5 +11,5 @@ namespace EventFlow.Application.Queries.LoginQuery
     (
         string Email,
         string Password
-        ) : IRequest<Result<string>>;
+        ) : IRequest<Result<AuthResponseDto>>;
 }

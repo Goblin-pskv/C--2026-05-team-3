@@ -1,5 +1,6 @@
 ﻿using EventFlow.Application.Commands.RegisterCommand;
 using EventFlow.Application.Commands.UpdateProfileCommand;
+using EventFlow.Application.Queries.GetProfileQuery;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -13,26 +14,31 @@ namespace EventFlow.API.Controllers
     {
         private readonly RegisterCommandHandler _registerHandler;
         private readonly UpdateProfileCommandHandler _updateHandler;
-        public TestController(RegisterCommandHandler registerHandler, UpdateProfileCommandHandler updateHandler)
+        private readonly GetProfileQueryHandler _getProfileQueryHandler;
+
+        public TestController(RegisterCommandHandler registerHandler, UpdateProfileCommandHandler updateHandler, GetProfileQueryHandler getProfileQuery)
         {
             _registerHandler = registerHandler;
             _updateHandler = updateHandler;
+            _getProfileQueryHandler = getProfileQuery;
         }
 
         // POST api/<ValuesController>
-        [HttpPost]
-        public async Task<IActionResult> Post([FromBody] RegisterUserCommand command, CancellationToken ct)
+        [HttpPost("register")]
+        public async Task<IActionResult> Registration([FromBody] RegisterUserCommand command, CancellationToken ct)
         {
-            command = new RegisterUserCommand("test", "test2", "awsd@e.ru", "asfddasfsdf", "dsad");
-            await _registerHandler.Handle(command, ct);
+            command = new RegisterUserCommand("UserNameNew1", "test", "test2", "awsd@e.ru", "asfdda1D@", "dsad");
+            var result = await _registerHandler.Handle(command, ct);
+            if (!result.IsSuccess)
+                return BadRequest(result.Error);
             return Ok();
         }
-        [HttpPut("{id}")]
+        [HttpPut("UpdateUser{id}")]
         public async Task<IActionResult> UpdateUser(string id, [FromBody] UpdateProfileCommand command, CancellationToken ct)
         {
             try
             {
-                command = new UpdateProfileCommand(Guid.Parse(id),"test2","test3","test@t.com","qwedasdewq");
+                command = new UpdateProfileCommand(Guid.Parse(id),"test2","test3","te@t.com","qwedasdewq");
                 await _updateHandler.Handle(command, ct);
                 return Ok(new { success = true, message = "Данные обновлены" });
             }
@@ -40,6 +46,12 @@ namespace EventFlow.API.Controllers
             {
                 return BadRequest(new { success = false, message = ex.Message });
             }
+        }
+        [HttpPut("GetProfile")]
+        public async Task<IActionResult> GetProfile([FromQuery] GetProfileQuery getProfileQuery, CancellationToken ct)
+        {
+            var dto = await _getProfileQueryHandler.Handle(getProfileQuery, ct);
+            return Ok(dto);
         }
     }
 }

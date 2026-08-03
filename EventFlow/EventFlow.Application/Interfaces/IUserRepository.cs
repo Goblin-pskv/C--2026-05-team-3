@@ -1,4 +1,5 @@
 ﻿using EventFlow.Domain.Entities;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -51,18 +52,14 @@ namespace EventFlow.Application.Interfaces
         /// После вызова нужно вызвать SaveChangesAsync().
         /// </summary>
         /// <param name="user">Сущность пользователя для добавления</param>
-        Task AddAsync(User user);
+        Task<IdentityResult> AddAsync(User user, string password);
 
         /// <summary>
         /// Обновить данные пользователя.
         /// Используется для изменения профиля, пароля и т.д.
         /// </summary>
         /// <param name="user">Пользователь с измененными данными</param>
-        void Update(User user);
-
-        /// <summary>
-        /// Сохранить все изменения в базе данных.
-        /// </summary>
-        Task SaveChangesAsync();
+        Task<IdentityResult> Update(User user);
+        Task<bool> CheckPasswordAsync(User user, string password);
     }
 }
