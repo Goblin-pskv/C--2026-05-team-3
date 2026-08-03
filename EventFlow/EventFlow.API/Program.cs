@@ -3,6 +3,7 @@ using EventFlow.Application.Commands.UpdateProfileCommand;
 using EventFlow.Application.Interfaces;
 using EventFlow.Infrastructure.Data;
 using EventFlow.Infrastructure.Repositories;
+using EventFlow.Infrastructure.Services;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,10 +20,13 @@ builder.Services.AddValidatorsFromAssembly(typeof(RegisterUserCommand).Assembly)
 builder.Services.AddScoped(typeof(IRepository<>), typeof(BaseRepository<>));
 builder.Services.AddScoped<RegisterCommandHandler>();
 builder.Services.AddScoped<UpdateProfileCommandHandler>();
-var connectionString = builder.Configuration.GetConnectionString("LocalPostgres");
+// JWT
+var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
+
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
 builder.Services.AddDbContext<EventFlowDbContext>(options =>
-    options.UseNpgsql(connectionString));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("LocalPostgres")));
 
 var app = builder.Build();
 

@@ -11,15 +11,13 @@ namespace EventFlow.Domain.Entities
     /// Пользователь системы.
     /// Может быть участником (Participant) или организатором (Organizer).
     /// </summary>
-    public class User : BaseEntity
+    public class User : IdentityUser<Guid>
     {
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;  
         public Organizer? OrganizerProfile { get; set; }
         public ICollection<Registration> Registrations { get; set; } = new List<Registration>();
         public string FullName => $"{FirstName} {LastName}";
-
-        public string Email { get; set; } = string.Empty;
 
     }
 }
