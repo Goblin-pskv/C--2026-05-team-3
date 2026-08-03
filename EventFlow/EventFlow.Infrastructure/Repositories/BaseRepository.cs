@@ -26,7 +26,7 @@ namespace EventFlow.Infrastructure.Repositories
     /// - Должен быть ссылочным типом (class)
     /// </summary>
     /// <typeparam name="T">Тип сущности (Event, User, Organizer, Registration)</typeparam>
-    public class BaseRepository<T> : IRepository<T> where T: BaseEntity
+    public class BaseRepository<T> : IRepository<T>, IDisposable where T : class
     {
         /// <summary>
         /// Контекст базы данных.
@@ -139,6 +139,18 @@ namespace EventFlow.Infrastructure.Repositories
         public async Task<int> SaveChangesAsync(CancellationToken ct)
         {
             return await _context.SaveChangesAsync(ct);
+        }
+
+
+        /// <summary>
+        /// Освобождение ресурсов (паттерн IDisposable).
+        /// DbContext освобождается автоматически через DI,
+        /// но этот метод нужен для явного управления.
+        /// </summary>
+        public void Dispose()
+        {
+            _context.Dispose();
+            GC.SuppressFinalize(this);
         }
     }
 }
