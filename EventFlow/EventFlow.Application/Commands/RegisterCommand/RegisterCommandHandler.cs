@@ -43,7 +43,7 @@ namespace EventFlow.Application.Commands.RegisterCommand
                 var errors = string.Join(',', result.Errors.Select(e => $"{e.Code}: {e.Description}"));
                 return Result<AuthResponseDto>.Failure(errors);
             }
-            string accessToken = "";//await _tokenService.GenerateTokenAsync(user);
+            string accessToken = await _tokenService.GenerateTokenAsync(user);
             string refreshToken = "";//await _refreshiTokenService.GenerateAndSaveRefreshTokenAsync(user.Id);
             var response = new AuthResponseDto(accessToken, refreshToken, DateTime.UtcNow);
             return Result<AuthResponseDto>.Success(response);

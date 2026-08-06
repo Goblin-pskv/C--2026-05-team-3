@@ -32,7 +32,7 @@ namespace EventFlow.API.Controllers
             if (!result.IsSuccess)
                 return BadRequest(new { Error = result.Error });
 
-            return Ok(new { Message = "User registered successfully" });
+            return Ok(result);
         }
 
         // POST: api/events
