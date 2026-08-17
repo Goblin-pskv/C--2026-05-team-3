@@ -4,7 +4,6 @@ using EventFlow.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
-using RefreshToken = EventFlow.Domain.Entities.RefreshToken;
 
 namespace EventFlow.Infrastructure.Services
 {
