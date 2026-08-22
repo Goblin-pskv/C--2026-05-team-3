@@ -32,7 +32,7 @@ namespace EventFlow.Application.Queries.LoginQuery
             if (!await _userRepository.CheckPasswordAsync(user, request.Password))
                 return Result<AuthResponseDto>.Failure("Пользователь с таким Email и пароль не найден");
             string accessToken = await _tokenService.GenerateTokenAsync(user);
-            string refreshToken = "";//await _refreshiTokenService.GenerateAndSaveRefreshTokenAsync(user.Id);
+            string refreshToken = await _refreshiTokenService.GenerateAndSaveRefreshTokenAsync(user.Id);
             var response = new AuthResponseDto(accessToken, refreshToken, DateTime.UtcNow);
             return Result<AuthResponseDto>.Success(response);
         }

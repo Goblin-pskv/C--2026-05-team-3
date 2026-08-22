@@ -12,11 +12,11 @@ namespace EventFlow.API.Controllers
     [ApiController]
     public class TestController : ControllerBase
     {
-        private readonly RegisterCommandHandler _registerHandler;
+        private readonly RegisterUserCommandHandler _registerHandler;
         private readonly UpdateProfileCommandHandler _updateHandler;
         private readonly GetProfileQueryHandler _getProfileQueryHandler;
 
-        public TestController(RegisterCommandHandler registerHandler, UpdateProfileCommandHandler updateHandler, GetProfileQueryHandler getProfileQuery)
+        public TestController(RegisterUserCommandHandler registerHandler, UpdateProfileCommandHandler updateHandler, GetProfileQueryHandler getProfileQuery)
         {
             _registerHandler = registerHandler;
             _updateHandler = updateHandler;

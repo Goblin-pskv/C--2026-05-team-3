@@ -24,7 +24,7 @@ builder.Services.AddMediatR(msc => msc.RegisterServicesFromAssembly(typeof(Regis
 builder.Services.AddValidatorsFromAssembly(typeof(RegisterUserCommand).Assembly);
 builder.Services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
 builder.Services.AddScoped(typeof(IRepository<>), typeof(BaseRepository<>));
-builder.Services.AddScoped<RegisterCommandHandler>();
+builder.Services.AddScoped<RegisterUserCommandHandler>();
 builder.Services.AddScoped<UpdateProfileCommandHandler>();
 builder.Services.AddScoped<GetProfileQueryHandler>();
 builder.Services.AddScoped<LoginQueryHandler>();
