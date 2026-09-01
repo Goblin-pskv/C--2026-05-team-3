@@ -10,8 +10,12 @@ namespace EventFlow.Application.Common.Validators
     {
         public LoginQueryValidator()
         {
-            RuleFor(x => x.Email).NotEmpty().EmailAddress().Matches(@"^[^@\s]+@[^@\s]+\.[^@\s]+$").WithMessage("Некорректный формат Email");
-            RuleFor(x => x.Password).NotEmpty();
+            RuleFor(x => x.Email)
+                .NotEmpty().WithMessage("Email is required")
+                .EmailAddress().Matches(@"^[^@\s]+@[^@\s]+\.[^@\s]+$").WithMessage("Invalid email format");
+
+            RuleFor(x => x.Password)
+                .NotEmpty().WithMessage("Password is required");
         }
     }
 }

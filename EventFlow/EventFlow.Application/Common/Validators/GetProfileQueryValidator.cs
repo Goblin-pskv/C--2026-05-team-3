@@ -1,7 +1,10 @@
 ﻿using EventFlow.Application.Queries.GetProfileQuery;
 using FluentValidation;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
-namespace EventFlow.Application.Queries.GetProfileQuery
+namespace EventFlow.Application.Common.Validators
 {
     public class GetProfileQueryValidator : AbstractValidator<GetProfileQuery>
     {
