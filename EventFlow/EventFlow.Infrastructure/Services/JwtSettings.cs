@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace EventFlow.Infrastructure.Services
+﻿namespace EventFlow.Infrastructure.Services
 {
     public class JwtSettings
     {

@@ -12,5 +12,5 @@ namespace EventFlow.Application.Commands.RegisterCommand
         string Email,
         string PasswordHash,
         string PhoneNumber
-    ) : IRequest<Result<AuthResponseDto>>;
+    ) : IRequest<Result>;
 }

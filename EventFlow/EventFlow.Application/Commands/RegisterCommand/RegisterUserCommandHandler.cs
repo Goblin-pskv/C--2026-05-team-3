@@ -8,21 +8,19 @@ using Microsoft.AspNetCore.Identity;
 
 namespace EventFlow.Application.Commands.RegisterCommand
 {
-    public class RegisterCommandHandler : IRequestHandler<RegisterUserCommand, Result<AuthResponseDto>>
+    public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, Result>
     {
         private readonly IUserRepository _userRepository;
         private readonly IValidator<RegisterUserCommand> _validator;
         private readonly ITokenService _tokenService;
-        private readonly IRefreshTokenService _refreshiTokenService;
 
-        public RegisterCommandHandler(IUserRepository userRepository, IValidator<RegisterUserCommand> validator, ITokenService tokenService, IRefreshTokenService refreshTokenService)
+        public RegisterUserCommandHandler(IUserRepository userRepository, IValidator<RegisterUserCommand> validator, ITokenService tokenService)
         {
             _userRepository = userRepository;
             _validator = validator;
             _tokenService = tokenService;
-            _refreshiTokenService = refreshTokenService;
         }
-        public async Task<Result<AuthResponseDto>> Handle(RegisterUserCommand request, CancellationToken ct)
+        public async Task<Result> Handle(RegisterUserCommand request, CancellationToken ct)
         {
             var validationResult = await _validator.ValidateAsync(request, ct);
             if (!validationResult.IsValid)
@@ -43,10 +41,7 @@ namespace EventFlow.Application.Commands.RegisterCommand
                 var errors = string.Join(',', result.Errors.Select(e => $"{e.Code}: {e.Description}"));
                 return Result<AuthResponseDto>.Failure(errors);
             }
-            string accessToken = "";//await _tokenService.GenerateTokenAsync(user);
-            string refreshToken = "";//await _refreshiTokenService.GenerateAndSaveRefreshTokenAsync(user.Id);
-            var response = new AuthResponseDto(accessToken, refreshToken, DateTime.UtcNow);
-            return Result<AuthResponseDto>.Success(response);
+            return Result.Success();
         }
     }
 }

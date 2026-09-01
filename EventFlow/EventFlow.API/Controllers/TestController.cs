@@ -12,11 +12,11 @@ namespace EventFlow.API.Controllers
     [ApiController]
     public class TestController : ControllerBase
     {
-        private readonly RegisterCommandHandler _registerHandler;
+        private readonly RegisterUserCommandHandler _registerHandler;
         private readonly UpdateProfileCommandHandler _updateHandler;
         private readonly GetProfileQueryHandler _getProfileQueryHandler;
 
-        public TestController(RegisterCommandHandler registerHandler, UpdateProfileCommandHandler updateHandler, GetProfileQueryHandler getProfileQuery)
+        public TestController(RegisterUserCommandHandler registerHandler, UpdateProfileCommandHandler updateHandler, GetProfileQueryHandler getProfileQuery)
         {
             _registerHandler = registerHandler;
             _updateHandler = updateHandler;
@@ -27,11 +27,11 @@ namespace EventFlow.API.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Registration([FromBody] RegisterUserCommand command, CancellationToken ct)
         {
-            command = new RegisterUserCommand("UserNameNew1", "test", "test2", "awsd@e.ru", "asfdda1D@", "dsad");
+            command = new RegisterUserCommand("UserNameNew1as", "test", "test2", "awsd@eджд.ru", "asfdda1D@", "dsad");
             var result = await _registerHandler.Handle(command, ct);
             if (!result.IsSuccess)
                 return BadRequest(result.Error);
-            return Ok();
+            return Ok(result);
         }
         [HttpPut("UpdateUser{id}")]
         public async Task<IActionResult> UpdateUser(string id, [FromBody] UpdateProfileCommand command, CancellationToken ct)
