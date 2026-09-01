@@ -27,19 +27,19 @@ namespace EventFlow.API.Controllers
         
         // POST: api/events
         [HttpPost("RegisterUser")]
-        public async Task<IActionResult> RegisterUserCommand(RegisterUserCommand command)
+        public async Task<IActionResult> RegisterUserCommand([FromBody] RegisterUserCommand command)
         {
             var result = await _mediator.Send(command);
 
             if (!result.IsSuccess)
                 return BadRequest(new { Error = result.Error });
 
-            return Ok(new { Message = "User registered successfully" });
+            return Ok(new { Message = "User registered successfully"});
         }
 
         // POST: api/events
         [HttpPost("UpdateUserProfile")]
-        public async Task<IActionResult> UpdateUserProfileCommand(UpdateProfileCommand command)
+        public async Task<IActionResult> UpdateUserProfileCommand([FromBody] UpdateProfileCommand command)
         {
             var result = await _mediator.Send(command);
 
@@ -51,7 +51,7 @@ namespace EventFlow.API.Controllers
 
         // POST: api/events
         [HttpPost("UserLogin")]
-        public async Task<IActionResult> UserLoginCommand(LoginQuery command)
+        public async Task<IActionResult> UserLoginCommand([FromBody] LoginQuery command)
         {
             var result = await _mediator.Send(command);
 
@@ -62,8 +62,8 @@ namespace EventFlow.API.Controllers
         }
 
         // POST: api/events
-        [HttpPost("GetProfile")]
-        public async Task<IActionResult> GetProfileCommand(GetProfileQuery command)
+        [HttpGet("GetProfile")]
+        public async Task<IActionResult> GetProfileCommand([FromBody] GetProfileQuery command)
         {
             var result = await _mediator.Send(command);
 

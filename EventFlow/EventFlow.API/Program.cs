@@ -8,6 +8,9 @@ using EventFlow.Infrastructure.Data;
 using EventFlow.Infrastructure.Repositories;
 using EventFlow.Infrastructure.Services;
 using FluentValidation;
+using EventFlow.Application.Behaviors;
+using MediatR;
+
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -16,6 +19,13 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+
+builder.Services.AddMediatR(cfg =>
+{
+    cfg.RegisterServicesFromAssembly(typeof(RegisterUserCommand).Assembly);
+    cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+});
+builder.Services.AddValidatorsFromAssembly(typeof(RegisterUserCommand).Assembly);
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
@@ -32,6 +42,7 @@ builder.Services.AddScoped<JwtSettings>();
 builder.Services.AddIdentity<User, IdentityRole<Guid>>().AddEntityFrameworkStores<EventFlowDbContext>().AddDefaultTokenProviders();
 builder.Services.AddScoped(typeof(ITokenService), typeof(TokenService));
 builder.Services.AddScoped(typeof(IRefreshTokenService), typeof(RefreshTokenService));
+builder.Services.AddScoped<IValidationService, ValidationService>();
 // JWT
 var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
 

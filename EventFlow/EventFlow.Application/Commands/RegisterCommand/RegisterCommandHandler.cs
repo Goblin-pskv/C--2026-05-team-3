@@ -33,11 +33,11 @@ namespace EventFlow.Application.Commands.RegisterCommand
             user.LastName = request.LastName;
             user.Email = request.Email;
             user.PhoneNumber = request.PhoneNumber;
-            if(await _userRepository.ExistsByEmailAsync(user.Email))
-            {
-                return Result<AuthResponseDto>.Failure("Такой Email уже существует");
-            }
-            var result = await _userRepository.AddAsync(user, request.PasswordHash);
+            //if(await _userRepository.ExistsByEmailAsync(user.Email))
+            //{
+            //    return Result<AuthResponseDto>.Failure("Такой Email уже существует");
+            //}
+            var result = await _userRepository.AddAsync(user, request.PasswordHash);    
             if(!result.Succeeded)
             {
                 var errors = string.Join(',', result.Errors.Select(e => $"{e.Code}: {e.Description}"));
