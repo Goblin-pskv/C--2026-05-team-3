@@ -13,7 +13,6 @@ using MediatR;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -52,6 +51,23 @@ builder.Services.AddDbContext<EventFlowDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("LocalPostgres")));
 
 var app = builder.Build();
+
+// сервис создания ролей
+using (var scope = app.Services.CreateScope())
+{
+    try
+    {
+        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+
+        await DataSeeder.SeedRolesAsync(roleManager, userManager);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Ошибка при создании ролей: {ex.Message}");
+        Console.WriteLine($"StackTrace: {ex.StackTrace}");
+    }
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

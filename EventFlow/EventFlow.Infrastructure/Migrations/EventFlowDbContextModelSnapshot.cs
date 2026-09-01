@@ -80,7 +80,7 @@ namespace EventFlow.Infrastructure.Migrations
 
                     b.HasIndex("OrganizerId");
 
-                    b.ToTable("Events");
+                    b.ToTable("Events", (string)null);
                 });
 
             modelBuilder.Entity("EventFlow.Domain.Entities.Organizer", b =>
@@ -115,7 +115,7 @@ namespace EventFlow.Infrastructure.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Organizers");
+                    b.ToTable("Organizers", (string)null);
                 });
 
             modelBuilder.Entity("EventFlow.Domain.Entities.RefreshToken", b =>
@@ -144,7 +144,7 @@ namespace EventFlow.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RefreshTokens");
+                    b.ToTable("RefreshTokens", (string)null);
                 });
 
             modelBuilder.Entity("EventFlow.Domain.Entities.Registration", b =>
@@ -180,7 +180,7 @@ namespace EventFlow.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Registrations");
+                    b.ToTable("Registrations", (string)null);
                 });
 
             modelBuilder.Entity("EventFlow.Domain.Entities.User", b =>
