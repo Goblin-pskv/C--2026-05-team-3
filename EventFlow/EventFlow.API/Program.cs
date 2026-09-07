@@ -1,9 +1,13 @@
 using EventFlow.Application.Behaviors;
+using EventFlow.Application.Commands.EventCommands;
 using EventFlow.Application.Commands.RegisterCommand;
+using EventFlow.Application.Commands.RegistrationCommands;
 using EventFlow.Application.Commands.UpdateProfileCommand;
 using EventFlow.Application.Interfaces;
+using EventFlow.Application.Queries.EventQueries;
 using EventFlow.Application.Queries.GetProfileQuery;
 using EventFlow.Application.Queries.LoginQuery;
+using EventFlow.Application.Queries.RegistrationQueries;
 using EventFlow.Domain.Entities;
 using EventFlow.Infrastructure.Data;
 using EventFlow.Infrastructure.Repositories;
@@ -74,6 +78,14 @@ builder.Services.AddScoped<RegisterUserCommandHandler>();
 builder.Services.AddScoped<UpdateProfileCommandHandler>();
 builder.Services.AddScoped<GetProfileQueryHandler>();
 builder.Services.AddScoped<LoginQueryHandler>();
+
+builder.Services.AddScoped<CreateEventCommandHandleMock>();
+builder.Services.AddScoped<UpdateEventCommandHandleMock>();
+builder.Services.AddScoped<CancelRegistrationCommandHandleMock>();
+builder.Services.AddScoped<CreateRegistrationCommandHandleMock>();
+builder.Services.AddScoped<GetEventQueryHandleMock>();
+builder.Services.AddScoped<GetEventRegistrationsQueryHandleMock>();
+builder.Services.AddScoped<GetUserRegistrationsQueryHandleMock>();
 builder.Services.AddScoped<JwtSettings>();
 builder.Services.AddIdentity<User, IdentityRole<Guid>>().AddEntityFrameworkStores<EventFlowDbContext>().AddDefaultTokenProviders();
 builder.Services.AddScoped(typeof(ITokenService), typeof(TokenService));
