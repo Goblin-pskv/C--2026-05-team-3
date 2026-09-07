@@ -1,3 +1,4 @@
+using EventFlow.Application.Behaviors;
 using EventFlow.Application.Commands.RegisterCommand;
 using EventFlow.Application.Commands.UpdateProfileCommand;
 using EventFlow.Application.Interfaces;
@@ -8,19 +9,41 @@ using EventFlow.Infrastructure.Data;
 using EventFlow.Infrastructure.Repositories;
 using EventFlow.Infrastructure.Services;
 using FluentValidation;
-using EventFlow.Application.Behaviors;
 using MediatR;
-
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
+using Serilog.Sinks.PostgreSQL;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+var logsConnectionString = builder.Configuration.GetConnectionString("LogsConnection");
 
-builder.Services.AddMediatR(cfg =>
-{
+builder.Host.UseSerilog((context, loggerConfiguration) => {
+    loggerConfiguration
+        .ReadFrom.Configuration(context.Configuration)
+        .Enrich.FromLogContext()
+        .Enrich.WithMachineName()
+
+        .WriteTo.PostgreSQL(
+            connectionString: logsConnectionString,
+            tableName: "logs",
+            needAutoCreateTable: true,
+            columnOptions: new Dictionary<string, ColumnWriterBase>
+            {
+                { "message", new RenderedMessageColumnWriter() },
+                { "message_template", new MessageTemplateColumnWriter() },
+                { "level", new LevelColumnWriter() },
+                { "time_stamp", new TimestampColumnWriter() },
+                { "exception", new ExceptionColumnWriter() },
+                { "properties", new PropertiesColumnWriter() }
+            }
+        );
+});
+
+builder.Services.AddMediatR(cfg => {
     cfg.RegisterServicesFromAssembly(typeof(RegisterUserCommand).Assembly);
     cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 });
@@ -29,8 +52,8 @@ builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddMediatR(msc => msc.RegisterServicesFromAssembly(typeof(RegisterUserCommand).Assembly));
-builder.Services.AddValidatorsFromAssembly(typeof(RegisterUserCommand).Assembly);
+// builder.Services.AddMediatR(msc => msc.RegisterServicesFromAssembly(typeof(RegisterUserCommand).Assembly));
+// builder.Services.AddValidatorsFromAssembly(typeof(RegisterUserCommand).Assembly);
 builder.Services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
 builder.Services.AddScoped(typeof(IRepository<>), typeof(BaseRepository<>));
 builder.Services.AddScoped<RegisterUserCommandHandler>();
@@ -52,26 +75,24 @@ builder.Services.AddDbContext<EventFlowDbContext>(options =>
 
 var app = builder.Build();
 
+app.UseSerilogRequestLogging(); // логируем все http запросы
+
 // сервис создания ролей
-using (var scope = app.Services.CreateScope())
-{
-    try
-    {
+using (var scope = app.Services.CreateScope()) {
+    try {
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
 
         await DataSeeder.SeedRolesAsync(roleManager, userManager);
     }
-    catch (Exception ex)
-    {
+    catch (Exception ex) {
         Console.WriteLine($"Ошибка при создании ролей: {ex.Message}");
         Console.WriteLine($"StackTrace: {ex.StackTrace}");
     }
 }
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
+if (app.Environment.IsDevelopment()) {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
