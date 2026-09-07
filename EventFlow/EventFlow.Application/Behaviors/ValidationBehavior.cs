@@ -30,7 +30,7 @@ namespace EventFlow.Application.Behaviors
                 // Проверяем, является ли TResponse типом Result (без generic)
                 if (typeof(TResponse) == typeof(Result))
                 {
-                    return (TResponse)(object)Result.Failure(errorMessage);
+                    return (TResponse)(object)Result.Failure(errorMessage, 400);
                 }
                 // Проверяем, является ли TResponse типом Result<T>
                 else if (typeof(TResponse).IsGenericType &&

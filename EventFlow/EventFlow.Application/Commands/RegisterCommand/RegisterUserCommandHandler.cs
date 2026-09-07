@@ -24,22 +24,20 @@ namespace EventFlow.Application.Commands.RegisterCommand
         {
             var validationResult = await _validator.ValidateAsync(request, ct);
             if (!validationResult.IsValid)
-                return Result<AuthResponseDto>.Failure(validationResult.Errors.First().ErrorMessage);
+                return Result<AuthResponseDto>.Failure(validationResult.Errors.First().ErrorMessage, 422);
+            if (await _userRepository.ExistsByEmailAsync(request.Email))
+                return Result<AuthResponseDto>.Failure("Пользователь с таким Email уже зарегистрирован", 409);
             var user = new User();
             user.UserName = request.UserName;
             user.FirstName = request.FirstName;
             user.LastName = request.LastName;
             user.Email = request.Email;
             user.PhoneNumber = request.PhoneNumber;
-            //if(await _userRepository.ExistsByEmailAsync(user.Email))
-            //{
-            //    return Result<AuthResponseDto>.Failure("Такой Email уже существует");
-            //}
-            var result = await _userRepository.AddAsync(user, request.PasswordHash);    
+            var result = await _userRepository.AddAsync(user, request.PasswordHash);
             if(!result.Succeeded)
             {
                 var errors = string.Join(',', result.Errors.Select(e => $"{e.Code}: {e.Description}"));
-                return Result<AuthResponseDto>.Failure(errors);
+                return Result<AuthResponseDto>.Failure(errors, 400);
             }
             return Result.Success();
         }
