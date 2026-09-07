@@ -24,55 +24,52 @@ namespace EventFlow.API.Controllers
         {
             _mediator = mediator;
         }
-        
-        // POST: api/events
+        /// <summary>
+        /// Регистрация нового пользователя
+        /// </summary>
+        /// <param name="command">Получает на вход json с полями</param>
+        /// <returns>Возвращает сообщение с кодом ответа</returns>
         [HttpPost("RegisterUser")]
         public async Task<IActionResult> RegisterUserCommand([FromBody] RegisterUserCommand command)
         {
             var result = await _mediator.Send(command);
 
             if (!result.IsSuccess)
-                return BadRequest(new { Error = result.Error });
-
-            return Ok(new { Message = "User registered successfully"});
+            {
+                switch (result.StatusCode)
+                {
+                    case 400:
+                        return BadRequest(result.Message);
+                    case 409:
+                        return Conflict(result.Message);
+                    case 422:
+                        return UnprocessableEntity(result.Message);
+                }
+            }
+            return Ok(result.Message);
         }
-
-        // POST: api/events
-        [HttpPost("UpdateUserProfile")]
-        public async Task<IActionResult> UpdateUserProfileCommand([FromBody] UpdateProfileCommand command)
-        {
-            var result = await _mediator.Send(command);
-
-            if (!result.IsSuccess)
-                return BadRequest(new { Error = result.Error });
-
-            return Ok(new { Message = "User profile updated successfully" });
-        }
-
-        // POST: api/events
+        /// <summary>
+        /// Авторизация по Email и паролю
+        /// </summary>
+        /// <param name="command">Получает на вход json с полями</param>
+        /// <returns>Возвращает данные токена, либо сообщение об ошибке</returns>
         [HttpPost("UserLogin")]
         public async Task<IActionResult> UserLoginCommand([FromBody] LoginQuery command)
         {
             var result = await _mediator.Send(command);
 
             if (!result.IsSuccess)
-                return BadRequest(new { Error = result.Error });
+                switch(result.StatusCode)
+                {
+                    case 400:
+                        return BadRequest(result.Message);
+                    case 404:
+                        return NotFound(result.Message);
+                    case 422:
+                        return UnprocessableEntity(result.Message);
+                }
 
-            return Ok(new { Message = "Login Succeded" });
-        }
-
-        // POST: api/events
-        [HttpGet("GetProfile")]
-        public async Task<IActionResult> GetProfileCommand([FromBody] GetProfileQuery command)
-        {
-            var result = await _mediator.Send(command);
-
-            if (!result.IsSuccess)
-                return BadRequest(new { Error = result.Error });
-
-            return Ok(result);
+            return Ok(result.Value);
         }
     }
 }
-
-

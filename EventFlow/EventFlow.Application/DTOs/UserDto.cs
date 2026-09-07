@@ -12,9 +12,6 @@ namespace EventFlow.Application.DTOs
     /// </summary>
     public class UserDto
     {
-        /// <summary>Уникальный идентификатор (UUID)</summary>
-        public Guid Id { get; set; }
-
         /// <summary>Имя пользователя</summary>
         public string FirstName { get; set; } = string.Empty;
 

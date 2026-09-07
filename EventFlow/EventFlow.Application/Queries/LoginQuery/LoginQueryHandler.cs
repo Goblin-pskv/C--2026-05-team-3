@@ -25,12 +25,12 @@ namespace EventFlow.Application.Queries.LoginQuery
         {
             var validationResult = await _validator.ValidateAsync(request, ct);
             if (!validationResult.IsValid)
-                return Result<AuthResponseDto>.Failure(validationResult.Errors.First().ErrorMessage);
+                return Result<AuthResponseDto>.Failure(validationResult.Errors.First().ErrorMessage, 400);
             User? user = await _userRepository.GetByEmailAsync(request.Email);
             if (user == null)
-                return Result<AuthResponseDto>.Failure("Пользователь с таким Email и пароль не найден");
+                return Result<AuthResponseDto>.Failure("Пользователь с таким Email и пароль не найден", 400);
             if (!await _userRepository.CheckPasswordAsync(user, request.Password))
-                return Result<AuthResponseDto>.Failure("Пользователь с таким Email и пароль не найден");
+                return Result<AuthResponseDto>.Failure("Пользователь с таким Email и пароль не найден", 400);
             string accessToken = await _tokenService.GenerateTokenAsync(user);
             string refreshToken = await _refreshiTokenService.GenerateAndSaveRefreshTokenAsync(user.Id);
             var response = new AuthResponseDto(accessToken, refreshToken, DateTime.UtcNow);

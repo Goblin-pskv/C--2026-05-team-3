@@ -19,7 +19,7 @@ namespace EventFlow.Application.Queries.GetProfileQuery
         {
             var user = await _repository.GetByIdAsync(request.UserId, ct);
             if (user == null)
-                return Result<UserDto>.Failure("Пользователь не найден");
+                return Result<UserDto>.Failure("Пользователь не найден", 404);
             //нашёл Dto, но нет конструктора, поэтому тут ЗАГЛУШКА
             var dto = new UserDto();
             dto.FullName = user.FullName;
