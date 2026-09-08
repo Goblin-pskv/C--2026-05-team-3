@@ -1,3 +1,5 @@
+using System.Reflection;
+using System.Text;
 using EventFlow.Application.Behaviors;
 using EventFlow.Application.Commands.EventCommands;
 using EventFlow.Application.Commands.RegisterCommand;
@@ -19,12 +21,37 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
-using System.Reflection;
-using System.Text;
+using Serilog;
+using Serilog.Sinks.PostgreSQL;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+var logsConnectionString = builder.Configuration.GetConnectionString("LogsConnection");
+
+builder.Host.UseSerilog((context, loggerConfiguration) =>
+{
+    loggerConfiguration
+        .ReadFrom.Configuration(context.Configuration)
+        .Enrich.FromLogContext()
+        .Enrich.WithMachineName()
+
+        .WriteTo.PostgreSQL(
+            connectionString: logsConnectionString,
+            tableName: "logs",
+            needAutoCreateTable: true,
+            columnOptions: new Dictionary<string, ColumnWriterBase>
+            {
+                { "message", new RenderedMessageColumnWriter() },
+                { "message_template", new MessageTemplateColumnWriter() },
+                { "level", new LevelColumnWriter() },
+                { "time_stamp", new TimestampColumnWriter() },
+                { "exception", new ExceptionColumnWriter() },
+                { "properties", new PropertiesColumnWriter() }
+            }
+        );
+});
 
 
 builder.Services.AddMediatR(cfg =>
@@ -117,8 +144,11 @@ builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSet
 builder.Services.AddDbContext<EventFlowDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("LocalPostgres")));
 
+builder.Services.AddProblemDetails(); // обработка ошибок
+
 var app = builder.Build();
 
+app.UseSerilogRequestLogging(); // логируем все http запросы
 // сервис создания ролей
 using (var scope = app.Services.CreateScope())
 {

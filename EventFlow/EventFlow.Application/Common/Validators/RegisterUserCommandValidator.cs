@@ -1,8 +1,5 @@
 ﻿using EventFlow.Application.Commands.RegisterCommand;
 using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace EventFlow.Application.Common.Validators
 {
@@ -15,7 +12,7 @@ namespace EventFlow.Application.Common.Validators
                 .EmailAddress().WithMessage("Invalid email format")
                 .MaximumLength(100).WithMessage("Email must not exceed 100 characters");
 
-            RuleFor(x => x.PasswordHash)
+            RuleFor(x => x.Password)
                 .NotEmpty().WithMessage("Password is required")
                 .MinimumLength(6).WithMessage("Password must be at least 6 characters")
                 .MaximumLength(50).WithMessage("Password must not exceed 50 characters")

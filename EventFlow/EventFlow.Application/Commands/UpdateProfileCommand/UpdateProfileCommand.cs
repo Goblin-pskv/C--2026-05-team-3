@@ -1,12 +1,12 @@
-﻿using EventFlow.Application.Common;
-using EventFlow.Domain.Enums;
+﻿using System.Text.Json.Serialization;
+using EventFlow.Application.Common;
 using MediatR;
 
 namespace EventFlow.Application.Commands.UpdateProfileCommand
 {
     public record UpdateProfileCommand
     (
-        Guid UserId,
+        [property: JsonIgnore] Guid UserId,
         string FirstName,
         string LastName,
         string Email,
