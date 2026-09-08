@@ -73,6 +73,8 @@ builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSet
 builder.Services.AddDbContext<EventFlowDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("LocalPostgres")));
 
+builder.Services.AddProblemDetails();
+
 var app = builder.Build();
 
 app.UseSerilogRequestLogging(); // логируем все http запросы

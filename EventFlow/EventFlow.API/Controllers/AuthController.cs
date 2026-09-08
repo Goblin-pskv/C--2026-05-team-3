@@ -15,69 +15,77 @@ namespace EventFlow.API.Controllers {
     [ApiController]
     public class AuthController : ControllerBase {
         private readonly IMediator _mediator;
-        public AuthController(IMediator mediator, ILogger<AuthController> logger)
+        public AuthController(IMediator mediator)
         {
             _mediator = mediator;
         }
 
-        // POST: api/Auth
+        // POST: api/events
         [HttpPost("RegisterUser")]
         public async Task<IActionResult> RegisterUserCommand([FromBody] RegisterUserCommand command)
         {
             var result = await _mediator.Send(command);
 
-            if (!result.IsSuccess)
-                return BadRequest(new {
-                    Error = result.Error
-                });
+            if (!result.IsSuccess) {
+                return Problem(
+                    statusCode: result.StatusCode,
+                    title: "Регистрация не удалась",
+                    detail: result.Error);
+            }
 
             return Ok(new {
                 Message = "User registered successfully"
             });
         }
 
-        // POST: api/Auth
+
+        // POST: api/events
         [HttpPost("UpdateUserProfile")]
         public async Task<IActionResult> UpdateUserProfileCommand([FromBody] UpdateProfileCommand command)
         {
             var result = await _mediator.Send(command);
 
-            if (!result.IsSuccess)
-                return BadRequest(new {
-                    Error = result.Error
-                });
-
+            if (!result.IsSuccess) {
+                return Problem(
+                    statusCode: result.StatusCode,
+                    title: "Обновление профиля не удалось",
+                    detail: result.Error);
+            }
             return Ok(new {
                 Message = "User profile updated successfully"
             });
         }
 
-        // POST: api/Auth
+        // POST: api/events
         [HttpPost("UserLogin")]
         public async Task<IActionResult> UserLoginCommand([FromBody] LoginQuery command)
         {
             var result = await _mediator.Send(command);
 
-            if (!result.IsSuccess)
-                return BadRequest(new {
-                    Error = result.Error
-                });
+            if (!result.IsSuccess) {
+                return Problem(
+                    statusCode: result.StatusCode,
+                    title: "Неудачная попытка входа",
+                    detail: result.Error);
+            }
 
             return Ok(new {
                 Message = "Login Succeded"
             });
         }
 
-        // POST: api/Auth
+        // POST: api/events
         [HttpGet("GetProfile")]
         public async Task<IActionResult> GetProfileCommand([FromBody] GetProfileQuery command)
         {
             var result = await _mediator.Send(command);
 
-            if (!result.IsSuccess)
-                return BadRequest(new {
-                    Error = result.Error
-                });
+            if (!result.IsSuccess) {
+                return Problem(
+                    statusCode: result.StatusCode,
+                    title: "Не удалось получить профиль",
+                    detail: result.Error);
+            }
 
             return Ok(result);
         }
