@@ -1,10 +1,9 @@
-﻿using EventFlow.Application.Commands.UpdateProfileCommand;
+﻿using System.Security.Claims;
+using EventFlow.Application.Commands.UpdateProfileCommand;
 using EventFlow.Application.Queries.GetProfileQuery;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace EventFlow.API.Controllers
 {
@@ -27,10 +26,14 @@ namespace EventFlow.API.Controllers
         public async Task<IActionResult> UpdateUserProfileCommand([FromBody] UpdateProfileCommand command)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized("Пользователь не авторизован");
+
             var commandWithGuid = command with { UserId = Guid.Parse(userId) };
-            var result = await _mediator.Send(command);
+
+            var result = await _mediator.Send(commandWithGuid);
+
             if (!result.IsSuccess)
             {
                 switch (result.StatusCode)
@@ -53,7 +56,7 @@ namespace EventFlow.API.Controllers
         public async Task<IActionResult> GetProfileCommand()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if(string.IsNullOrEmpty(userId))
+            if (string.IsNullOrEmpty(userId))
                 return Unauthorized("Пользователь не авторизован");
             var command = new GetProfileQuery(Guid.Parse(userId));
             var result = await _mediator.Send(command);
