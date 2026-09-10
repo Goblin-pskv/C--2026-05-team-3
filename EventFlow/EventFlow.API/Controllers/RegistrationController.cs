@@ -74,13 +74,38 @@ namespace EventFlow.API.Controllers
             return Ok(result.Message);
         }
         /// <summary>
-        /// Получить список своих регистрация на мероприятия
+        /// Получить список своих регистраций на мероприятия
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        [HttpGet("my")]
+        public async Task<IActionResult> GetUserRegistrationsQuery([FromQuery] GetUserRegistrationsQueryMock command)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized("Пользователь не авторизован");
+            Result? result = await _mediator.Send(new GetUserRegistrationsQueryWithUserIdMock(Guid.Parse(userId)));
+            if (!result.IsSuccess)
+            {
+                switch (result.StatusCode)
+                {
+                    case 400:
+                        return BadRequest(result.Message);
+                    case 404:
+                        return NotFound(result.Message);
+                }
+            }
+            return Ok(result);
+        }
+        /// <summary>
+        /// Получить список зарегестрировавшихся на мероприятие
         /// </summary>
         /// <param name="eventId"></param>
         /// <param name="command"></param>
         /// <returns></returns>
-        [HttpGet("{eventId}/my")]
-        public async Task<IActionResult> GetUserRegistrationsQuery(Guid eventId, [FromBody] GetUserRegistrationsQueryMock command)
+        [Authorize(Roles = "Organizer, Admin")]
+        [HttpGet("{eventId}/all")]
+        public async Task<IActionResult> GetEventRegistrationsQuery(Guid eventId, [FromRoute] GetEventRegistrationsQueryMock command)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userId))
@@ -97,19 +122,7 @@ namespace EventFlow.API.Controllers
                         return NotFound(result.Message);
                 }
             }
-            return Ok(result.Message);
-        }
-        /// <summary>
-        /// Получить список зарегестрировавшихся на мероприятие
-        /// </summary>
-        /// <param name="eventId"></param>
-        /// <param name="command"></param>
-        /// <returns></returns>
-        [Authorize(Roles = "Organizer, Admin")]
-        [HttpGet("{eventId}/all")]
-        public async Task<IActionResult> GetEventRegistrationsQuery(Guid eventId, [FromBody] GetEventRegistrationsQueryMock command)
-        {//Пока заглушка.
-            throw new NotImplementedException();
+            return Ok(result);
         }
     }
 }
