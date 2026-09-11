@@ -97,8 +97,6 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
-builder.Services.AddMediatR(msc => msc.RegisterServicesFromAssembly(typeof(RegisterUserCommand).Assembly));
-builder.Services.AddValidatorsFromAssembly(typeof(RegisterUserCommand).Assembly);
 builder.Services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
 builder.Services.AddScoped(typeof(IRepository<>), typeof(BaseRepository<>));
 builder.Services.AddScoped<RegisterUserCommandHandler>();
@@ -119,7 +117,9 @@ builder.Services.AddScoped(typeof(ITokenService), typeof(TokenService));
 builder.Services.AddScoped(typeof(IRefreshTokenService), typeof(RefreshTokenService));
 builder.Services.AddScoped<IValidationService, ValidationService>();
 // JWT
-var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
+var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>()
+    ?? throw new InvalidOperationException(
+        "Секция 'JwtSettings' не найдена или не может быть корректно привязана в конфигурации.");
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -161,8 +161,7 @@ using (var scope = app.Services.CreateScope())
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"Ошибка при создании ролей: {ex.Message}");
-        Console.WriteLine($"StackTrace: {ex.StackTrace}");
+        Log.Error(ex, "Ошибка при создании ролей");
     }
 }
 
