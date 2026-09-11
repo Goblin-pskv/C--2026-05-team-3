@@ -42,14 +42,15 @@ namespace EventFlow.Infrastructure.Repositories
         /// <param name="pageSize">Размер страницы</param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        public async Task<List<Event>> GetEventsWithDetailsAsync(int page, int pageSize, CancellationToken ct)
+        public async Task<List<Event>> GetEventsWithDetailsAsync(int page, int pageSize, DateTime dateStart, DateTime dateEnd, CancellationToken ct)
         {
             return await _dbSet.Include(_ => _.Registrations)
                                .Include(_ => _.Organizer)
+                               .Where(_ => _.Start >= dateStart || _.End <= dateEnd)
                                .OrderBy(_ => _.Start)
                                .Skip(page *  pageSize)
                                .Take(pageSize)
-                               .ToListAsync();
+                               .ToListAsync(ct);
         }
     }
 }
