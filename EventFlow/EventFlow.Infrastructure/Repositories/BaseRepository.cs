@@ -26,7 +26,7 @@ namespace EventFlow.Infrastructure.Repositories
     /// - Должен быть ссылочным типом (class)
     /// </summary>
     /// <typeparam name="T">Тип сущности (Event, User, Organizer, Registration)</typeparam>
-    public class BaseRepository<T> : IRepository<T>, IDisposable where T : class
+    public class BaseRepository<T> : IRepository<T> where T : BaseEntity
     {
         /// <summary>
         /// Контекст базы данных.
@@ -51,16 +51,25 @@ namespace EventFlow.Infrastructure.Repositories
         }
 
         /// <summary>
-        /// Получить сущность по ID.
-        /// Базовая реализация — простой FindAsync.
-        /// Наследники могут переопределить для Include связанных данных.
+        /// Получить сущность по ID.        
         /// </summary>
         /// <param name="id">UUID сущности</param>
         /// <returns>Сущность или null, если не найдена</returns>
-        public virtual async Task<T?> GetByIdAsync(Guid id, CancellationToken ct)
+        public async Task<T?> GetByIdAsync(Guid id, CancellationToken ct)
         {
             return await _dbSet.FindAsync(new object[] { id }, ct);
+        }
 
+        /// <summary>
+        /// Базовая реализация — простой FindAsync.
+        /// Наследники могут переопределить для Include связанных данных. 
+        /// </summary>
+        /// <param name="id">UUID сущности</param>>
+        /// <param name="ct"></param>
+        /// <returns>Сущность или null, если не найдена</returns>
+        public virtual async Task<T?> GetByIdWithIncludesAsync(Guid id, CancellationToken ct)
+        {
+            return await _dbSet.FindAsync(new object[] { id }, ct);
         }
 
         /// <summary>
@@ -139,18 +148,6 @@ namespace EventFlow.Infrastructure.Repositories
         public async Task<int> SaveChangesAsync(CancellationToken ct)
         {
             return await _context.SaveChangesAsync(ct);
-        }
-
-
-        /// <summary>
-        /// Освобождение ресурсов (паттерн IDisposable).
-        /// DbContext освобождается автоматически через DI,
-        /// но этот метод нужен для явного управления.
-        /// </summary>
-        public void Dispose()
-        {
-            _context.Dispose();
-            GC.SuppressFinalize(this);
         }
     }
 }
