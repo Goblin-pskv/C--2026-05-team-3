@@ -8,7 +8,7 @@ using System.Text;
 
 namespace EventFlow.Infrastructure.Repositories
 {
-    public class EventRepository(EventFlowDbContext context) : BaseRepository<Event>(context), IRepository<Event>
+    public class EventRepository(EventFlowDbContext context) : BaseRepository<Event>(context), IEventRepository
     {
         /// <summary>
         /// Реализация метода получения сущности со связанными данными для Event.
@@ -18,9 +18,10 @@ namespace EventFlow.Infrastructure.Repositories
         /// <returns>Event или null, если не найдена</returns>
         public override async Task<Event?> GetByIdWithIncludesAsync(Guid id, CancellationToken ct)
         {
-            return await _dbSet.Include(_ => _.Organizer)
-                               .Include(_ => _.Registrations)
-                               .FirstOrDefaultAsync(_ => _.Id == id);
+            return await _dbSet
+                .Include(e => e.Organizer)
+                .Include(e => e.Registrations)
+                .FirstOrDefaultAsync(e => e.Id == id, ct);
         }
 
         /// <summary>
@@ -31,8 +32,9 @@ namespace EventFlow.Infrastructure.Repositories
         /// <returns>Event или null, если не найдена</returns>
         public async Task<Event?> GetEventWithRegistrationsAsync(Guid eventId, CancellationToken ct)
         {
-            return await _dbSet.Include(_ => _.Registrations)
-                               .FirstOrDefaultAsync(_ => _.Id == eventId);
+            return await _dbSet
+                .Include(e => e.Registrations)
+                .FirstOrDefaultAsync(e => e.Id == eventId, ct);
         }
 
         /// <summary>
@@ -42,15 +44,31 @@ namespace EventFlow.Infrastructure.Repositories
         /// <param name="pageSize">Размер страницы</param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        public async Task<List<Event>> GetEventsWithDetailsAsync(int page, int pageSize, DateTime dateStart, DateTime dateEnd, CancellationToken ct)
+        public async Task<List<Event>> GetEventsWithDetailsAsync(
+            int page, int pageSize, DateTime dateStart, DateTime dateEnd, CancellationToken ct)
         {
-            return await _dbSet.Include(_ => _.Registrations)
-                               .Include(_ => _.Organizer)
-                               .Where(_ => _.Start >= dateStart || _.End <= dateEnd)
-                               .OrderBy(_ => _.Start)
-                               .Skip(page *  pageSize)
-                               .Take(pageSize)
-                               .ToListAsync(ct);
+            return await _dbSet
+                .Include(e => e.Registrations)
+                .Include(e => e.Organizer)
+                .Where(e => e.Start >= dateStart || e.End <= dateEnd)
+                .OrderBy(e => e.Start)
+                .Skip(page * pageSize)
+                .Take(pageSize)
+                .ToListAsync(ct);
+        }
+
+        public async Task<List<Event>> GetPublishedEventsAsync(CancellationToken ct)
+        {
+            return await _dbSet
+                .Where(e => e.IsPublished)
+                .ToListAsync(ct);
+        }
+
+        public async Task<List<Event>> GetByOrganizerIdAsync(Guid organizerId, CancellationToken ct)
+        {
+            return await _dbSet
+                .Where(e => e.OrganizerId == organizerId)
+                .ToListAsync(ct);
         }
     }
 }

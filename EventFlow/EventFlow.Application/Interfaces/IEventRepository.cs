@@ -23,67 +23,13 @@ namespace EventFlow.Application.Interfaces
     /// - Все методы асинхронные для производительности
     /// - Методы возвращают Domain-сущности, а не DTO
     /// </summary>
-    public interface IEventRepository
+    public interface IEventRepository : IRepository<Event>
     {
-        /// <summary>
-        /// Получить мероприятие по уникальному идентификатору.
-        /// Возвращает мероприятие с загруженными связанными данными
-        /// (организатор, регистрации).
-        /// </summary>
-        /// <param name="id">UUID мероприятия</param>
-        /// <returns>Мероприятие или null, если не найдено</returns>
-        /// <example>
-        /// var @event = await _repository.GetByIdAsync(eventId);
-        /// if (@event == null) throw new DomainException("Не найдено");
-        /// </example>
-        Task<Event?> GetByIdAsync(Guid id);
+        Task<List<Event>> GetPublishedEventsAsync(CancellationToken ct);
+        Task<List<Event>> GetByOrganizerIdAsync(Guid organizerId, CancellationToken ct);
+        Task<Event?> GetEventWithRegistrationsAsync(Guid eventId, CancellationToken ct);
+        Task<List<Event>> GetEventsWithDetailsAsync(
+            int page, int pageSize, DateTime dateStart, DateTime dateEnd, CancellationToken ct);
 
-        /// <summary>
-        /// Получить список всех опубликованных мероприятий.
-        /// Возвращает только мероприятия со статусом Published.
-        /// Используется для отображения каталога мероприятий.
-        /// </summary>
-        /// <returns>Список опубликованных мероприятий</returns>
-        Task<List<Event>> GetPublishedEventsAsync();
-
-        /// <summary>
-        /// Получить все мероприятия конкретного организатора.
-        /// Включает черновики, опубликованные и отмененные.
-        /// Используется в личном кабинете организатора.
-        /// </summary>
-        /// <param name="organizerId">UUID организатора</param>
-        /// <returns>Список мероприятий организатора</returns>
-        Task<List<Event>> GetByOrganizerIdAsync(Guid organizerId);
-
-        /// <summary>
-        /// Добавить новое мероприятие в базу данных.
-        /// После вызова нужно вызвать SaveChangesAsync() для сохранения.
-        /// </summary>
-        /// <param name="event">Сущность мероприятия для добавления</param>
-        Task AddAsync(Event @event);
-
-        /// <summary>
-        /// Обновить существующее мероприятие.
-        /// EF Core автоматически отслеживает изменения.
-        /// После вызова нужно вызвать SaveChangesAsync().
-        /// </summary>
-        /// <param name="event">Мероприятие с измененными данными</param>
-        void Update(Event @event);
-
-        /// <summary>
-        /// Удалить мероприятие из базы данных.
-        /// Используется для удаления черновиков.
-        /// После вызова нужно вызвать SaveChangesAsync().
-        /// </summary>
-        /// <param name="event">Мероприятие для удаления</param>
-        void Delete(Event @event);
-
-        /// <summary>
-        /// Сохранить все изменения в базе данных.
-        /// Выполняет COMMIT транзакции.
-        /// Вызывается после Add/Update/Delete операций.
-        /// </summary>
-        Task SaveChangesAsync();
-        
     }
 }
