@@ -1,56 +1,88 @@
 ﻿using EventFlow.Application.Interfaces;
 using EventFlow.Domain.Entities;
+using EventFlow.Domain.Enums;
 using EventFlow.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace EventFlow.Infrastructure.Repositories
 {
-    public class EventRepository(EventFlowDbContext context) : BaseRepository<Event>(context), IRepository<Event>
+    /// <summary>
+    /// Реализация репозитория для работы с мероприятиями.
+    /// Наследуется от BaseRepository&lt;Event&gt; и реализует IEventRepository.
+    /// </summary>
+    public class EventRepository : BaseRepository<Event>, IEventRepository
     {
-        /// <summary>
-        /// Реализация метода получения сущности со связанными данными для Event.
-        /// </summary>
-        /// <param name="id">UUID мероприятия</param>>
-        /// <param name="ct"></param>
-        /// <returns>Event или null, если не найдена</returns>
-        public override async Task<Event?> GetByIdWithIncludesAsync(Guid id, CancellationToken ct)
+        public EventRepository(EventFlowDbContext context) : base(context)
         {
-            return await _dbSet.Include(_ => _.Organizer)
-                               .Include(_ => _.Registrations)
-                               .FirstOrDefaultAsync(_ => _.Id == id);
         }
 
         /// <summary>
-        /// Возвращает информацию о мероприятии, включая список регистраций, по id.
+        /// Получить мероприятие по ID с загрузкой связанных данных
         /// </summary>
-        /// <param name="eventId">UUID мероприятия</param>>
-        /// <param name="ct"></param>
-        /// <returns>Event или null, если не найдена</returns>
-        public async Task<Event?> GetEventWithRegistrationsAsync(Guid eventId, CancellationToken ct)
+        public async Task<Event?> GetByIdAsync(Guid id)
         {
-            return await _dbSet.Include(_ => _.Registrations)
-                               .FirstOrDefaultAsync(_ => _.Id == eventId);
+            return await _dbSet
+                .Include(e => e.Organizer)
+                .Include(e => e.Registrations)
+                .FirstOrDefaultAsync(e => e.Id == id);
         }
 
         /// <summary>
-        /// Возвращает детализированный списов мероприятий с пагинацией.
+        /// Получить список всех опубликованных мероприятий
         /// </summary>
-        /// <param name="page">Порядковый номер страницы</param>
-        /// <param name="pageSize">Размер страницы</param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
-        public async Task<List<Event>> GetEventsWithDetailsAsync(int page, int pageSize, DateTime dateStart, DateTime dateEnd, CancellationToken ct)
+        public async Task<List<Event>> GetPublishedEventsAsync()
         {
-            return await _dbSet.Include(_ => _.Registrations)
-                               .Include(_ => _.Organizer)
-                               .Where(_ => _.Start >= dateStart || _.End <= dateEnd)
-                               .OrderBy(_ => _.Start)
-                               .Skip(page *  pageSize)
-                               .Take(pageSize)
-                               .ToListAsync(ct);
+            return await _dbSet
+                .Where(e => e.IsPublished && e.Status == EventStatus.Published)
+                .OrderBy(e => e.Start)
+                .ToListAsync();
+        }
+
+        /// <summary>
+        /// Получить все мероприятия конкретного организатора
+        /// </summary>
+        public async Task<List<Event>> GetByOrganizerIdAsync(Guid organizerId)
+        {
+            return await _dbSet
+                .Where(e => e.OrganizerId == organizerId)
+                .OrderByDescending(e => e.CreatedAt)
+                .ToListAsync();
+        }
+
+        /// <summary>
+        /// Добавить новое мероприятие
+        /// </summary>
+        public async Task AddAsync(Event @event)
+        {
+            await _dbSet.AddAsync(@event);
+        }
+
+        /// <summary>
+        /// Обновить мероприятие
+        /// </summary>
+        public void Update(Event @event)
+        {
+            _dbSet.Update(@event);
+        }
+
+        /// <summary>
+        /// Удалить мероприятие
+        /// </summary>
+        public void Delete(Event @event)
+        {
+            _dbSet.Remove(@event);
+        }
+
+        /// <summary>
+        /// Сохранить изменения в БД
+        /// </summary>
+        public async Task SaveChangesAsync()
+        {
+            await _context.SaveChangesAsync();
         }
     }
 }
