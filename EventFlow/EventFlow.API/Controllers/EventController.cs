@@ -26,7 +26,7 @@ namespace EventFlow.API.Controllers
         /// <param name="command"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<IActionResult> CreateEventCommand([FromBody] CreateEventCommand command)
+        public async Task<IActionResult> CreateEventCommand([FromBody] CreateEventCommandMock command)
         {
             Result? result = await _mediator.Send(command);
             if (!result.IsSuccess)

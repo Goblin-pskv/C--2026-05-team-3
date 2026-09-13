@@ -104,9 +104,7 @@ builder.Services.AddScoped<UpdateProfileCommandHandler>();
 builder.Services.AddScoped<GetProfileQueryHandler>();
 builder.Services.AddScoped<LoginQueryHandler>();
 
-builder.Services.AddScoped(typeof(IEventRepository), typeof(EventRepository));
-
-builder.Services.AddScoped<CreateEventCommandHandler>();
+builder.Services.AddScoped<CreateEventCommandHandleMock>();
 builder.Services.AddScoped<UpdateEventCommandHandleMock>();
 builder.Services.AddScoped<CancelRegistrationCommandHandleMock>();
 builder.Services.AddScoped<CreateRegistrationCommandHandleMock>();
