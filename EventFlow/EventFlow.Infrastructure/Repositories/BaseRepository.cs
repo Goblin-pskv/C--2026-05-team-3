@@ -26,7 +26,7 @@ namespace EventFlow.Infrastructure.Repositories
     /// - Должен быть ссылочным типом (class)
     /// </summary>
     /// <typeparam name="T">Тип сущности (Event, User, Organizer, Registration)</typeparam>
-    public class BaseRepository<T> : IRepository<T> where T : class
+    public class BaseRepository<T> : IRepository<T> where T : BaseEntity
     {
         /// <summary>
         /// Контекст базы данных.
