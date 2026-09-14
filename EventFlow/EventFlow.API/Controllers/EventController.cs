@@ -26,7 +26,7 @@ namespace EventFlow.API.Controllers
         /// <param name="command"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<IActionResult> CreateEventCommand([FromBody] CreateEventCommandMock command)
+        public async Task<IActionResult> CreateEventCommand([FromBody] CreateEventCommand command)
         {
             Result? result = await _mediator.Send(command);
             if (!result.IsSuccess)
@@ -45,14 +45,13 @@ namespace EventFlow.API.Controllers
         /// Получение данных о мероприятии
         /// </summary>
         /// <param name="eventId"></param>
-        /// <param name="command"></param>
         /// <returns></returns>
         [AllowAnonymous]
         [HttpGet("{eventId}")]
-        public async Task<IActionResult> GetEventQuery(Guid eventId, GetEventQueryMock command)
+        public async Task<IActionResult> GetEventQuery(Guid eventId)
         {
-            var commandWithGuid = command with { EventId = eventId };
-            Result? result = await _mediator.Send(commandWithGuid);
+            var query = new GetEventQueryMock { EventId = eventId };
+            var result = await _mediator.Send(query);
             if (!result.IsSuccess)
             {
                 switch (result.StatusCode)
@@ -63,7 +62,7 @@ namespace EventFlow.API.Controllers
                         return NotFound(result.Message);
                 }
             }
-            return Ok(result.Message);
+            return Ok(result);
         }
         /// <summary>
         /// Обновление данных мероприятия
@@ -72,7 +71,7 @@ namespace EventFlow.API.Controllers
         /// <param name="command"></param>
         /// <returns></returns>
         [HttpPut("{eventId}")]
-        public async Task<IActionResult> UpdateEventCommand (Guid eventId, [FromBody] UpdateEventCommandMock command)
+        public async Task<IActionResult> UpdateEventCommand (Guid eventId, [FromBody] UpdateEventCommand command)
         {
             var commandWithGuid = command with { EventId = eventId};
             Result? result = await _mediator.Send(commandWithGuid);

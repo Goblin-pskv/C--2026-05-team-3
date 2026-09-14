@@ -7,7 +7,7 @@ using System.Text;
 
 namespace EventFlow.Application.Common.Validators
 {
-    public class CreateEventCommandValidator : AbstractValidator<CreateEventCommandMock>
+    public class CreateEventCommandValidator : AbstractValidator<CreateEventCommand>
     {
         public CreateEventCommandValidator()
         {

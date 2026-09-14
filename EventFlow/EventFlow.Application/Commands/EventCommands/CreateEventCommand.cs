@@ -7,7 +7,7 @@ using System.Text;
 
 namespace EventFlow.Application.Commands.EventCommands
 {
-    public record CreateEventCommandMock(
+    public record CreateEventCommand(
         string Title,
         string Description,
         EventType Type,

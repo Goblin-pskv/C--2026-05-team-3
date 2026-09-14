@@ -7,5 +7,8 @@ using System.Text;
 
 namespace EventFlow.Application.Queries.EventQueries
 {
-    public record GetEventQueryMock(Guid EventId) : IRequest<Result<EventDto>>;
+    public record GetEventQueryMock() : IRequest<Result<EventDto>>
+    {
+    public Guid EventId { get; init; }
+    }
 }

@@ -12,17 +12,17 @@ using System.Text;
 
 namespace EventFlow.Application.Commands.EventCommands
 {
-    public class CreateEventCommandHandleMock : IRequestHandler<CreateEventCommandMock, Result>
+    public class CreateEventCommandHandle : IRequestHandler<CreateEventCommand, Result>
     {
 
-        private readonly IValidator<CreateEventCommandMock> _validator;
+        private readonly IValidator<CreateEventCommand> _validator;
         private readonly IEventRepository _eventRepository;
-        private ILogger<CreateEventCommandHandleMock> _logger;
+        private ILogger<CreateEventCommandHandle> _logger;
 
 
-        public CreateEventCommandHandleMock(IEventRepository eventRepository,
-                                           IValidator<CreateEventCommandMock> validator,
-                                           ILogger<CreateEventCommandHandleMock> logger)
+        public CreateEventCommandHandle(IEventRepository eventRepository,
+                                           IValidator<CreateEventCommand> validator,
+                                           ILogger<CreateEventCommandHandle> logger)
         {
             _eventRepository = eventRepository;
             _validator = validator;
@@ -31,7 +31,7 @@ namespace EventFlow.Application.Commands.EventCommands
 
 
 
-        public async Task<Result> Handle(CreateEventCommandMock request, CancellationToken cancellationToken)
+        public async Task<Result> Handle(CreateEventCommand request, CancellationToken cancellationToken)
         {
             _logger.LogInformation(
                              "Регистрация начата для мероприятия: {Title})",
