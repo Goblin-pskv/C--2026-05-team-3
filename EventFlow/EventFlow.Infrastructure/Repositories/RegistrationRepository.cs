@@ -1,5 +1,6 @@
 ﻿using EventFlow.Application.Interfaces;
 using EventFlow.Domain.Entities;
+using EventFlow.Domain.Enums;
 using EventFlow.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -8,7 +9,7 @@ using System.Text;
 
 namespace EventFlow.Infrastructure.Repositories
 {
-    public class RegistrationRepository(EventFlowDbContext context) : BaseRepository<Registration>(context), IRepository<Registration>
+    public class RegistrationRepository(EventFlowDbContext context) : BaseRepository<Registration>(context), IRegistrationRepository
     {
         /// <summary>
         /// Возвращает регистрацию по id пользователя и id события.
@@ -43,5 +44,14 @@ namespace EventFlow.Infrastructure.Repositories
             return await _dbSet.Where(_ => _.EventId == eventId)
                                .ToListAsync();
         }
+
+        public async Task<int> CountConfirmedAsync(Guid eventId, CancellationToken ct)
+        {
+            return await _dbSet
+                .CountAsync(r => r.EventId == eventId
+                              && (r.Status == RegistrationStatus.Confirmed
+                               || r.Status == RegistrationStatus.Attended), ct);
+        }
+
     }
 }

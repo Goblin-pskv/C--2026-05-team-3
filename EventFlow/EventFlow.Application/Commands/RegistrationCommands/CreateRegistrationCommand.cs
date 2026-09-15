@@ -6,7 +6,7 @@ using System.Text;
 
 namespace EventFlow.Application.Commands.RegistrationCommands
 {
-    public record CreateRegistrationCommandMock(
+    public record CreateRegistrationCommand(
         Guid EventId,
         Guid UserId
         ) : IRequest<Result>;
