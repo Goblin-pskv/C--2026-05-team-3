@@ -71,7 +71,7 @@ namespace EventFlow.Application.Commands.RegistrationCommands
 
             // Проверка что пользователь ещё не зарегистрирован
             var existing = await _registrationRepository
-                .GetRegistrationAsync(request.UserId, request.EventId);
+                .GetRegistrationAsync(request.UserId, request.EventId, cancellationToken);
 
             if (existing is not null)
             {

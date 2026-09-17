@@ -17,9 +17,9 @@ namespace EventFlow.Infrastructure.Repositories
         /// <param name="userId">UUID пользователя</param>
         /// <param name="eventId">UUID мероприятия</param>
         /// <returns>Регистрация на событие</returns>
-        public async Task<Registration?> GetRegistrationAsync(Guid userId, Guid eventId)
+        public async Task<Registration?> GetRegistrationAsync(Guid userId, Guid eventId, CancellationToken ct)
         {
-            return await _dbSet.FirstOrDefaultAsync(_ => _.UserId == userId && _.EventId == eventId);
+            return await _dbSet.FirstOrDefaultAsync(_ => _.UserId == userId && _.EventId == eventId, ct);
         }
 
         /// Возвращает список регистраций пользователя по id.

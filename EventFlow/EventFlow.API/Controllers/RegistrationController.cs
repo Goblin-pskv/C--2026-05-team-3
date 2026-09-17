@@ -54,7 +54,7 @@ namespace EventFlow.API.Controllers
         /// <param name="command"></param>
         /// <returns></returns>
         [HttpDelete("{eventId}")]
-        public async Task<IActionResult> CancelRegistrationCommand([FromRoute] Guid eventId, [FromBody] CancelRegistrationCommandMock command)
+        public async Task<IActionResult> CancelRegistrationCommand([FromRoute] Guid eventId, [FromBody] CancelRegistrationCommand command)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userId))

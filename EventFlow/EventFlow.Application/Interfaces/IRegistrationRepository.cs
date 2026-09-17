@@ -18,7 +18,7 @@ namespace EventFlow.Application.Interfaces
     /// </summary>
     public interface IRegistrationRepository : IRepository<Registration>
     {
-        Task<Registration?> GetRegistrationAsync(Guid userId, Guid eventId);
+        Task<Registration?> GetRegistrationAsync(Guid userId, Guid eventId, CancellationToken ct);
         Task<List<Registration>> GetRegistrationsByUserIdAsync(Guid userId, CancellationToken ct);
         Task<List<Registration>> GetRegistrationsByEventIdAsync(Guid eventId, CancellationToken ct);
 
