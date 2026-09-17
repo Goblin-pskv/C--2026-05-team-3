@@ -28,13 +28,14 @@ namespace EventFlow.API.Controllers
         /// <param name="command"></param>
         /// <returns></returns>
         [HttpPost("{eventId}")]
-        public async Task<IActionResult> CreateRegistrationCommand(Guid eventId, [FromBody] CreateRegistrationCommand command)
+        public async Task<IActionResult> CreateRegistrationCommand(Guid eventId)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId))
+
+            if (!Guid.TryParse(userId, out Guid userGuid))
                 return Unauthorized("Пользователь не авторизован");
-            var commandWithGuid = command with { EventId = eventId, UserId = Guid.Parse(userId)};
-            Result? result = await _mediator.Send(commandWithGuid);
+            var command = new CreateRegistrationCommand(eventId, userGuid);
+            Result? result = await _mediator.Send(command);
             if (!result.IsSuccess)
             {
                 switch (result.StatusCode)
@@ -54,13 +55,13 @@ namespace EventFlow.API.Controllers
         /// <param name="command"></param>
         /// <returns></returns>
         [HttpDelete("{eventId}")]
-        public async Task<IActionResult> CancelRegistrationCommand([FromRoute] Guid eventId, [FromBody] CancelRegistrationCommand command)
+        public async Task<IActionResult> CancelRegistrationCommand(Guid eventId)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId))
+            if (!Guid.TryParse(userId, out Guid userGuid))
                 return Unauthorized("Пользователь не авторизован");
-            var commandWithGuid = command with { EventId = eventId, UserId = Guid.Parse(userId) };
-            Result? result = await _mediator.Send(commandWithGuid);
+            var command = new CancelRegistrationCommand(eventId, userGuid);
+            Result? result = await _mediator.Send(command);
             if (!result.IsSuccess)
             {
                 switch (result.StatusCode)
@@ -79,13 +80,13 @@ namespace EventFlow.API.Controllers
         /// <param name="command"></param>
         /// <returns></returns>
         [HttpGet("my")]
-        public async Task<IActionResult> GetUserRegistrationsQuery([FromQuery] GetUserRegistrationsQuery command)
+        public async Task<IActionResult> GetUserRegistrationsQuery()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId))
+            if (!Guid.TryParse(userId, out Guid userGuid))
                 return Unauthorized("Пользователь не авторизован");
 
-            var query = new GetUserRegistrationsQuery(Guid.Parse(userId));
+            var query = new GetUserRegistrationsQuery(userGuid);
             var result = await _mediator.Send(query);
 
             if (!result.IsSuccess)
@@ -103,15 +104,14 @@ namespace EventFlow.API.Controllers
         /// <summary>
         /// Получить список зарегестрировавшихся на мероприятие
         /// </summary>
-        /// <param name="EventId"></param>
+        /// <param name="eventId"></param>
         /// <param name="command"></param>
         /// <returns></returns>
         [Authorize(Roles = "Organizer, Admin")]
-        [HttpGet("{EventId}/all")]
-        public async Task<IActionResult> GetEventRegistrationsQuery(Guid EventId, [FromRoute] GetEventRegistrationsQuery command)
+        [HttpGet("{eventId}/all")]
+        public async Task<IActionResult> GetEventRegistrationsQuery(Guid eventId)
         {
-
-            var query = new GetEventRegistrationsQuery(EventId);
+            var query = new GetEventRegistrationsQuery(eventId);
             var result = await _mediator.Send(query);
 
             if (!result.IsSuccess)
