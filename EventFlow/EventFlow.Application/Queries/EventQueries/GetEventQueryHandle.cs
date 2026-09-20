@@ -6,20 +6,20 @@ using Microsoft.Extensions.Logging;
 
 namespace EventFlow.Application.Queries.EventQueries
 {
-    public class GetEventQueryHandleMock : IRequestHandler<GetEventQueryMock, Result<EventDto>>
+    public class GetEventQueryHandle : IRequestHandler<GetEventQuery, Result<EventDto>>
     {
         private readonly IEventRepository _eventRepository;
-        private readonly ILogger<GetEventQueryHandleMock> _logger;
+        private readonly ILogger<GetEventQueryHandle> _logger;
 
-        public GetEventQueryHandleMock(
+        public GetEventQueryHandle(
             IEventRepository eventRepository,
-            ILogger<GetEventQueryHandleMock> logger)
+            ILogger<GetEventQueryHandle> logger)
         {
             _eventRepository = eventRepository;
             _logger = logger;
         }
 
-        public async Task<Result<EventDto>> Handle(GetEventQueryMock request, CancellationToken cancellationToken)
+        public async Task<Result<EventDto>> Handle(GetEventQuery request, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Получение мероприятия по Id: {EventId}", request.EventId);
 

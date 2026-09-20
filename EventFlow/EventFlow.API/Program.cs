@@ -111,7 +111,7 @@ builder.Services.AddScoped<CreateEventCommandHandle>();
 builder.Services.AddScoped<UpdateEventCommandHandle>();
 builder.Services.AddScoped<CancelRegistrationCommandHandleMock>();
 builder.Services.AddScoped<CreateRegistrationCommandHandle>();
-builder.Services.AddScoped<GetEventQueryHandleMock>();
+builder.Services.AddScoped<GetEventQueryHandle>();
 builder.Services.AddScoped<GetEventRegistrationsQueryHandle>();
 builder.Services.AddScoped<GetUserRegistrationsQueryHandle>();
 builder.Services.AddScoped<JwtSettings>();

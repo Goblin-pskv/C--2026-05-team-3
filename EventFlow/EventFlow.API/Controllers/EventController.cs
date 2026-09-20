@@ -50,7 +50,7 @@ namespace EventFlow.API.Controllers
         [HttpGet("{eventId}")]
         public async Task<IActionResult> GetEventQuery(Guid eventId)
         {
-            var query = new GetEventQueryMock { EventId = eventId };
+            var query = new GetEventQuery { EventId = eventId };
             var result = await _mediator.Send(query);
             if (!result.IsSuccess)
             {

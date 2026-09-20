@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace EventFlow.Application.Queries.EventValidators
 {
-    public class GetEventQueryMockValidator : AbstractValidator<GetEventQueryMock>
+    public class GetEventQueryMockValidator : AbstractValidator<GetEventQuery>
     {
         public GetEventQueryMockValidator()
         {
