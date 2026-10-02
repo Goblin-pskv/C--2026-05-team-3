@@ -46,9 +46,8 @@ namespace EventFlow.Application.Commands.RegisterCommand
             if (await _userRepository.ExistsByEmailAsync(request.Email))
             {
                 _logger.LogWarning(
-                  "Пользователь с таким {Email} уже зарегистрирован: {Error}",
-                  request.Email,
-                  validationResult.Errors.First().ErrorMessage);
+                  "Пользователь с таким {Email} уже зарегистрирован.",
+                  request.Email);
                 return Result<AuthResponseDto>.Failure("Пользователь с таким Email уже зарегистрирован", 409);
             }
             var user = new User
