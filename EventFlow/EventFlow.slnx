@@ -3,4 +3,5 @@
   <Project Path="EventFlow.Application/EventFlow.Application.csproj" />
   <Project Path="EventFlow.Domain/EventFlow.Domain.csproj" />
   <Project Path="EventFlow.Infrastructure/EventFlow.Infrastructure.csproj" Id="4919c5d5-8305-45ae-8759-308a2b535a7b" />
+  <Project Path="EventFlow.Tests/EventFlow.Tests.csproj" Id="30327fcd-a90b-4630-899f-98c6ab7be825" />
 </Solution>
