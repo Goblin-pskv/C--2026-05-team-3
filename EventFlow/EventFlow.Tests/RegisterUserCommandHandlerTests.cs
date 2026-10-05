@@ -2,6 +2,7 @@ using EventFlow.Application.Commands.RegisterCommand;
 using EventFlow.Application.Interfaces;
 using EventFlow.Domain.Entities;
 using FluentValidation;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System.Threading;
@@ -48,15 +49,16 @@ namespace EventFlow.Tests
             var validationResult = new FluentValidation.Results.ValidationResult();
             validationResult.Errors.Add(new FluentValidation.Results.ValidationFailure("Email", "Email is required"));
 
-            _validatorMock.Setup(v => v.ValidateAsync(command, CancellationToken.None))
+            _validatorMock.Setup(v => v.ValidateAsync(command, It.IsAny<CancellationToken>()))
                          .ReturnsAsync(validationResult);
 
             // Act
-            var result = await _handler.Handle(command, CancellationToken.None);
+            var result = await _handler.Handle(command, It.IsAny<CancellationToken>());
 
             // Assert
             Assert.False(result.IsSuccess);
             Assert.Equal(422, result.StatusCode);
+            _userRepositoryMock.Verify(r => r.AddAsync(It.IsAny<User>(), command.Password), Times.Never);
         }
 
         [Fact]
@@ -74,18 +76,19 @@ namespace EventFlow.Tests
 
             var validationResult = new FluentValidation.Results.ValidationResult();
 
-            _validatorMock.Setup(v => v.ValidateAsync(command, CancellationToken.None))
+            _validatorMock.Setup(v => v.ValidateAsync(command, It.IsAny<CancellationToken>()))
                          .ReturnsAsync(validationResult);
             
             _userRepositoryMock.Setup(r => r.ExistsByEmailAsync(command.Email))
                               .ReturnsAsync(true);
 
             // Act
-            var result = await _handler.Handle(command, CancellationToken.None);
+            var result = await _handler.Handle(command, It.IsAny<CancellationToken>());
 
-            // Assert
+            // Asserts
             Assert.False(result.IsSuccess);
             Assert.Equal(409, result.StatusCode);
+            _userRepositoryMock.Verify(r => r.AddAsync(It.IsAny<User>(), command.Password), Times.Never);
         }
 
         [Fact]
@@ -103,7 +106,7 @@ namespace EventFlow.Tests
 
             var validationResult = new FluentValidation.Results.ValidationResult();
 
-            _validatorMock.Setup(v => v.ValidateAsync(command, CancellationToken.None))
+            _validatorMock.Setup(v => v.ValidateAsync(command, It.IsAny<CancellationToken>()))
                          .ReturnsAsync(validationResult);
             
             _userRepositoryMock.Setup(r => r.ExistsByEmailAsync(command.Email))
@@ -122,6 +125,7 @@ namespace EventFlow.Tests
             // Assert
             Assert.False(result.IsSuccess);
             Assert.Equal(400, result.StatusCode);
+            _userRepositoryMock.Verify(r => r.AddAsync(It.IsAny<User>(), command.Password), Times.Once);
         }
 
         [Fact]
@@ -132,20 +136,20 @@ namespace EventFlow.Tests
                 "testuser",
                 "Test",
                 "User",
-                "test@example.com",
+                "admin@eventflow.com",
                 "Password123!",
                 "1234567890"
             );
 
             var validationResult = new FluentValidation.Results.ValidationResult();
 
-            _validatorMock.Setup(v => v.ValidateAsync(command, CancellationToken.None))
+            _validatorMock.Setup(v => v.ValidateAsync(command, It.IsAny<CancellationToken>()))
                          .ReturnsAsync(validationResult);
             
             _userRepositoryMock.Setup(r => r.ExistsByEmailAsync(command.Email))
                               .ReturnsAsync(false);
             
-            var identityResult = Microsoft.AspNetCore.Identity.IdentityResult.Success;
+            var identityResult = IdentityResult.Success;
             
             _userRepositoryMock.Setup(r => r.AddAsync(It.IsAny<User>(), command.Password))
                               .ReturnsAsync(identityResult);
@@ -155,6 +159,7 @@ namespace EventFlow.Tests
 
             // Assert
             Assert.True(result.IsSuccess);
+            _userRepositoryMock.Verify(r => r.AddAsync(It.IsAny<User>(), command.Password), Times.Once);
         }
     }
 }

@@ -38,6 +38,12 @@ namespace EventFlow.Application.Commands.EventCommands
                              request.Title
                          );
             var validationResult = await _validator.ValidateAsync(request, cancellationToken);
+            if(!validationResult.IsValid)
+            {
+                var errors = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage));
+                _logger.LogWarning("Ошибка валидации при создании нового события: {Errors}", errors);
+                return Result.Failure(errors, 422);
+            }
 
             var new_event = new Event
             {   
