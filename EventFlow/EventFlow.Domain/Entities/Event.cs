@@ -61,6 +61,8 @@ namespace EventFlow.Domain.Entities
         /// </summary>
         public virtual ICollection<Registration> Registrations { get; set; } = new List<Registration>();
 
+        public virtual ICollection<Tickets> Tickets { get; set; } = new List<Tickets>();
+
         /// <summary>
         /// Проверяет, есть ли свободные места на мероприятии.
         /// Используется перед регистрацией пользователя.

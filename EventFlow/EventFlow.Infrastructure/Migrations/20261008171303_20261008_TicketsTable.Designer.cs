@@ -3,6 +3,7 @@ using System;
 using EventFlow.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EventFlow.Infrastructure.Migrations
 {
     [DbContext(typeof(EventFlowDbContext))]
-    partial class EventFlowDbContextModelSnapshot : ModelSnapshot
+    [Migration("20261008171303_20261008_TicketsTable")]
+    partial class _20261008_TicketsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -116,51 +119,6 @@ namespace EventFlow.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Organizers");
-                });
-
-            modelBuilder.Entity("EventFlow.Domain.Entities.Payment", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime?>("LastModificationDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime?>("PaidAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("PaymentCreationDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("PaymentId")
-                        .HasColumnType("uuid");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("numeric");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid>("TicketId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TicketId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Payment");
                 });
 
             modelBuilder.Entity("EventFlow.Domain.Entities.RefreshToken", b =>
@@ -508,25 +466,6 @@ namespace EventFlow.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("EventFlow.Domain.Entities.Payment", b =>
-                {
-                    b.HasOne("EventFlow.Domain.Entities.Tickets", "Ticket")
-                        .WithMany("Payments")
-                        .HasForeignKey("TicketId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("EventFlow.Domain.Entities.User", "User")
-                        .WithMany("Payments")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Ticket");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("EventFlow.Domain.Entities.RefreshToken", b =>
                 {
                     b.HasOne("EventFlow.Domain.Entities.User", "User")
@@ -639,16 +578,9 @@ namespace EventFlow.Infrastructure.Migrations
                     b.Navigation("Events");
                 });
 
-            modelBuilder.Entity("EventFlow.Domain.Entities.Tickets", b =>
-                {
-                    b.Navigation("Payments");
-                });
-
             modelBuilder.Entity("EventFlow.Domain.Entities.User", b =>
                 {
                     b.Navigation("OrganizerProfile");
-
-                    b.Navigation("Payments");
 
                     b.Navigation("Registrations");
 

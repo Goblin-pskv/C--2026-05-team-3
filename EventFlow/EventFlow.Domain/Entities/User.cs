@@ -18,6 +18,7 @@ namespace EventFlow.Domain.Entities
         public Organizer? OrganizerProfile { get; set; }
         public ICollection<Registration> Registrations { get; set; } = new List<Registration>();
         public string FullName => $"{FirstName} {LastName}";
-
+        public virtual ICollection<Tickets> Tickets { get; set; } = new List<Tickets>();
+        public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
     }
 }
