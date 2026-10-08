@@ -15,22 +15,22 @@ namespace EventFlow.Tests
     {
         private readonly Mock<IUserRepository> _userRepositoryMock;
         private readonly Mock<IValidator<RegisterUserCommand>> _validatorMock;
-        private readonly Mock<ITokenService> _tokenServiceMock;
         private readonly Mock<ILogger<RegisterUserCommandHandler>> _loggerMock;
+        private readonly Mock<IMessageService> _messageServiceMock;
         private readonly RegisterUserCommandHandler _handler;
 
         public RegisterUserCommandHandlerTests()
         {
             _userRepositoryMock = new Mock<IUserRepository>();
             _validatorMock = new Mock<IValidator<RegisterUserCommand>>();
-            _tokenServiceMock = new Mock<ITokenService>();
             _loggerMock = new Mock<ILogger<RegisterUserCommandHandler>>();
+            _messageServiceMock = new Mock<IMessageService>();
             
             _handler = new RegisterUserCommandHandler(
                 _userRepositoryMock.Object,
                 _validatorMock.Object,
-                _tokenServiceMock.Object,
-                _loggerMock.Object);
+                _loggerMock.Object,
+                _messageServiceMock.Object);
         }
 
         [Fact]

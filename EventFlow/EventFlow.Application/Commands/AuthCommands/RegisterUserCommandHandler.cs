@@ -12,17 +12,18 @@ namespace EventFlow.Application.Commands.RegisterCommand
     {
         private readonly IUserRepository _userRepository;
         private readonly IValidator<RegisterUserCommand> _validator;
-        private readonly ITokenService _tokenService;
         private readonly ILogger<RegisterUserCommandHandler> _logger;
+        private readonly IMessageService _emailService;
+
         public RegisterUserCommandHandler(IUserRepository userRepository,
                                           IValidator<RegisterUserCommand> validator,
-                                          ITokenService tokenService,
-                                          ILogger<RegisterUserCommandHandler> logger)
+                                          ILogger<RegisterUserCommandHandler> logger,
+                                          IMessageService messageService)
         {
             _userRepository = userRepository;
             _validator = validator;
-            _tokenService = tokenService;
             _logger = logger;
+            _emailService = messageService;
         }
         public async Task<Result> Handle(RegisterUserCommand request, CancellationToken ct)
         {
@@ -71,6 +72,7 @@ namespace EventFlow.Application.Commands.RegisterCommand
 
                 return Result<AuthResponseDto>.Failure(errors, 400);
             }
+            await _emailService.SendEmailAsync(user.Email, "test", "Регистрация успешно завершена");
             return Result.Success();
         }
     }

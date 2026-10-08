@@ -119,6 +119,14 @@ builder.Services.AddIdentity<User, IdentityRole<Guid>>().AddEntityFrameworkStore
 builder.Services.AddScoped(typeof(ITokenService), typeof(TokenService));
 builder.Services.AddScoped(typeof(IRefreshTokenService), typeof(RefreshTokenService));
 builder.Services.AddScoped<IValidationService, ValidationService>();
+builder.Services.Configure<EmailServiceSettings>(es =>
+{
+    //es.SmtpHost = "localhost";
+    //es.SmtpPort = 1025;
+    //es.FromEmail = "Reg@EventFlow.ru";
+    //es.DisplayName = "EventFlow";
+});
+builder.Services.AddScoped<IMessageService, EmailMessageService>();
 // JWT
 var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>()
     ?? throw new InvalidOperationException(
