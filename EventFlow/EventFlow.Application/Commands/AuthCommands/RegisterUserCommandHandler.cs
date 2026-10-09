@@ -72,7 +72,7 @@ namespace EventFlow.Application.Commands.RegisterCommand
 
                 return Result<AuthResponseDto>.Failure(errors, 400);
             }
-            await _emailService.SendEmailAsync(user.Email, "test", "Регистрация успешно завершена");
+            await _emailService.SendEmailAsync(user.Email, "test", "Регистрация успешно завершена", ct);
             return Result.Success();
         }
     }
