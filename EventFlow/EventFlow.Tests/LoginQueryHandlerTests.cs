@@ -69,7 +69,7 @@ namespace EventFlow.Tests
                          .ReturnsAsync(validationResult);
             
             _userRepositoryMock.Setup(r => r.GetByEmailAsync(query.Email))
-                               .ReturnsAsync((User)null);
+                               .ReturnsAsync((User?)null);
 
             // Act
             var result = await _handler.Handle(query, CancellationToken.None);

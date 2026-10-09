@@ -30,7 +30,7 @@ namespace EventFlow.Application.Interfaces
         /// <param name="subject">Тема письма</param>
         /// <param name="body">Тело письма</param>
         /// <returns>Завершение операции</returns>
-        Task SendEmailAsync(string to, string subject, string body);
+        Task SendEmailAsync(string to, string subject, string body, CancellationToken ct);
 
         /// <summary>
         /// Отправить email сообщение с возможностью указать список адресов копии.
@@ -40,7 +40,7 @@ namespace EventFlow.Application.Interfaces
         /// <param name="subject">Тема письма</param>
         /// <param name="body">Тело письма</param>
         /// <returns>Завершение операции</returns>
-        Task SendEmailAsync(string to, IEnumerable<string> cc, string subject, string body);
+        Task SendEmailAsync(string to, IEnumerable<string> cc, string subject, string body, CancellationToken ct);
 
         /// <summary>
         /// Отправить email сообщение с возможностью указать список адресов копии и скрытой копии.
@@ -51,6 +51,6 @@ namespace EventFlow.Application.Interfaces
         /// <param name="subject">Тема письма</param>
         /// <param name="body">Тело письма</param>
         /// <returns>Завершение операции</returns>
-        Task SendEmailAsync(string to, IEnumerable<string> cc, IEnumerable<string> bcc, string subject, string body);
+        Task SendEmailAsync(string to, IEnumerable<string> cc, IEnumerable<string> bcc, string subject, string body, CancellationToken ct);
     }
 }

@@ -74,7 +74,7 @@ namespace EventFlow.Tests
                          .ReturnsAsync(validationResult);
 
             _userRepositoryMock.Setup(r => r.GetByIdAsync(userId))
-                              .ReturnsAsync((User)null);
+                              .ReturnsAsync((User?)null);
 
             var result = await _handler.Handle(command, It.IsAny<CancellationToken>());
 
