@@ -4,6 +4,7 @@ using EventFlow.Application.Interfaces;
 using EventFlow.Domain.Entities;
 using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
 namespace EventFlow.Application.Commands.RegisterCommand
@@ -13,16 +14,19 @@ namespace EventFlow.Application.Commands.RegisterCommand
         private readonly IUserRepository _userRepository;
         private readonly IValidator<RegisterUserCommand> _validator;
         private readonly ILogger<RegisterUserCommandHandler> _logger;
+        private readonly IEmailConfirmTokenService _emailConfirmTokenService;
         private readonly IMessageService _emailService;
 
         public RegisterUserCommandHandler(IUserRepository userRepository,
                                           IValidator<RegisterUserCommand> validator,
                                           ILogger<RegisterUserCommandHandler> logger,
+                                          IEmailConfirmTokenService emailConfirmTokenService,
                                           IMessageService messageService)
         {
             _userRepository = userRepository;
             _validator = validator;
             _logger = logger;
+            _emailConfirmTokenService = emailConfirmTokenService;
             _emailService = messageService;
         }
         public async Task<Result> Handle(RegisterUserCommand request, CancellationToken ct)
@@ -72,7 +76,9 @@ namespace EventFlow.Application.Commands.RegisterCommand
 
                 return Result<AuthResponseDto>.Failure(errors, 400);
             }
-            await _emailService.SendEmailAsync(user.Email, "test", "Регистрация успешно завершена", ct);
+            var token = await _emailConfirmTokenService.GenerateAsync(user.Id);
+            await _emailService.SendEmailAsync(user.Email, "Подтверждение регистрации на EventFlow", 
+                $@"Регистрация успешно завершена. Перейдите по ссылке, чтобы подтвердить свою регистрацию:{request.urlToController}?userId={Uri.EscapeDataString(user.Id.ToString())}&token={Uri.EscapeDataString(token)}", ct);
             return Result.Success();
         }
     }

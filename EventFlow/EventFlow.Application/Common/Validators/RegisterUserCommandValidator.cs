@@ -37,6 +37,8 @@ namespace EventFlow.Application.Common.Validators
             RuleFor(x => x.PhoneNumber)
                 .Matches(@"^\+?[1-9]\d{1,14}$").WithMessage("Invalid phone number format")
                 .When(x => !string.IsNullOrEmpty(x.PhoneNumber));
+            RuleFor(x => x.urlToController)
+                .NotEmpty().WithMessage("Url is required");
         }
     }
 }

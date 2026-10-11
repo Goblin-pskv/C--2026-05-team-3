@@ -20,7 +20,7 @@ namespace EventFlow.Infrastructure.Services
             _userManager = userManager;
         }
 
-        public async Task<string> GenerateTokenAsync(User user)
+        public async Task<(string, DateTime)> GenerateTokenAsync(User user)
         {
             var claims = new List<Claim>
             {
@@ -54,7 +54,7 @@ namespace EventFlow.Infrastructure.Services
 
                 );
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            return (new JwtSecurityTokenHandler().WriteToken(token), token.ValidTo);
         }
     }
 }

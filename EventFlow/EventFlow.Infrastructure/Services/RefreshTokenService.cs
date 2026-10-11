@@ -3,7 +3,9 @@ using EventFlow.Domain.Entities;
 using EventFlow.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.Intrinsics.Arm;
 using System.Security.Cryptography;
+using System.Text;
 
 namespace EventFlow.Infrastructure.Services
 {
@@ -12,14 +14,17 @@ namespace EventFlow.Infrastructure.Services
         private readonly EventFlowDbContext _context;
         private readonly UserManager<User> _userManager;
         private readonly JwtSettings _jwtSettings;
+        private readonly ITokenHasher _tokenHasher;
 
         public RefreshTokenService(EventFlowDbContext context,
                                    UserManager<User> userManager,
-                                   JwtSettings jwtSettings)
+                                   JwtSettings jwtSettings,
+                                   ITokenHasher tokenHasher)
         {
             _context = context;
             _userManager = userManager;
             _jwtSettings = jwtSettings;
+            _tokenHasher = tokenHasher;
         }
 
         /// <summary>
@@ -35,7 +40,7 @@ namespace EventFlow.Infrastructure.Services
             var tokenString = Convert.ToBase64String(randomNumber); // токен
 
             // хэшируем перед отправкой в БД
-            string hashToken = BCrypt.Net.BCrypt.HashPassword(tokenString);
+            string hashToken = _tokenHasher.Hash(tokenString);
 
             var refreshToken = new RefreshToken
             {

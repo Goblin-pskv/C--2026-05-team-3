@@ -31,9 +31,9 @@ namespace EventFlow.Application.Queries.LoginQuery
                 return Result<AuthResponseDto>.Failure("Пользователь с таким Email и пароль не найден", 400);
             if (!await _userRepository.CheckPasswordAsync(user, request.Password))
                 return Result<AuthResponseDto>.Failure("Пользователь с таким Email и пароль не найден", 400);
-            string accessToken = await _tokenService.GenerateTokenAsync(user);
+            var (accessToken, expiresAt) = await _tokenService.GenerateTokenAsync(user);
             string refreshToken = await _refreshiTokenService.GenerateAndSaveRefreshTokenAsync(user.Id);
-            var response = new AuthResponseDto(accessToken, refreshToken, DateTime.UtcNow);
+            var response = new AuthResponseDto(accessToken, refreshToken, expiresAt);
             return Result<AuthResponseDto>.Success(response);
         }
     }

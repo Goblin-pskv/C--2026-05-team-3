@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Text;
 using EventFlow.Application.Behaviors;
+using EventFlow.Application.Commands.AuthCommands;
 using EventFlow.Application.Commands.EventCommands;
 using EventFlow.Application.Commands.RegisterCommand;
 using EventFlow.Application.Commands.RegistrationCommands;
@@ -106,7 +107,6 @@ builder.Services.AddScoped<RegisterUserCommandHandler>();
 builder.Services.AddScoped<UpdateProfileCommandHandler>();
 builder.Services.AddScoped<GetProfileQueryHandler>();
 builder.Services.AddScoped<LoginQueryHandler>();
-
 builder.Services.AddScoped<CreateEventCommandHandle>();
 builder.Services.AddScoped<UpdateEventCommandHandle>();
 builder.Services.AddScoped<CancelRegistrationCommandHandleMock>();
@@ -114,10 +114,13 @@ builder.Services.AddScoped<CreateRegistrationCommandHandle>();
 builder.Services.AddScoped<GetEventQueryHandle>();
 builder.Services.AddScoped<GetEventRegistrationsQueryHandle>();
 builder.Services.AddScoped<GetUserRegistrationsQueryHandle>();
+builder.Services.AddScoped<RefreshUserCommandHandler>();
 builder.Services.AddScoped<JwtSettings>();
 builder.Services.AddIdentity<User, IdentityRole<Guid>>().AddEntityFrameworkStores<EventFlowDbContext>().AddDefaultTokenProviders();
 builder.Services.AddScoped(typeof(ITokenService), typeof(TokenService));
 builder.Services.AddScoped(typeof(IRefreshTokenService), typeof(RefreshTokenService));
+builder.Services.AddScoped(typeof(ITokenHasher), typeof(Sha256TokenHasher));
+builder.Services.AddScoped(typeof(IEmailConfirmTokenService), typeof(EmailConfirmTokenService));
 builder.Services.AddScoped<IValidationService, ValidationService>();
 builder.Services.Configure<EmailServiceSettings>(es =>
 {
@@ -180,7 +183,11 @@ using (var scope = app.Services.CreateScope())
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API v1"));
+    app.UseSwaggerUI(c => 
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API v1");
+        c.EnablePersistAuthorization();
+    });
 }
 
 app.UseHttpsRedirection();

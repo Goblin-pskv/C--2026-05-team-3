@@ -141,7 +141,7 @@ namespace EventFlow.Tests
                                .ReturnsAsync(true);
             
             _tokenServiceMock.Setup(t => t.GenerateTokenAsync(user))
-                            .ReturnsAsync("access_token");
+                            .ReturnsAsync(("access_token", DateTime.UtcNow));
             
             _refreshTokenServiceMock.Setup(r => r.GenerateAndSaveRefreshTokenAsync(user.Id))
                                    .ReturnsAsync("refresh_token");

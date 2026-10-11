@@ -1,6 +1,7 @@
 using EventFlow.Application.Commands.RegisterCommand;
 using EventFlow.Application.Interfaces;
 using EventFlow.Domain.Entities;
+using EventFlow.Infrastructure.Services;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
@@ -16,6 +17,7 @@ namespace EventFlow.Tests
         private readonly Mock<IUserRepository> _userRepositoryMock;
         private readonly Mock<IValidator<RegisterUserCommand>> _validatorMock;
         private readonly Mock<ILogger<RegisterUserCommandHandler>> _loggerMock;
+        private readonly Mock<IEmailConfirmTokenService> _emailConfirmTokenService;
         private readonly Mock<IMessageService> _messageServiceMock;
         private readonly RegisterUserCommandHandler _handler;
 
@@ -24,12 +26,14 @@ namespace EventFlow.Tests
             _userRepositoryMock = new Mock<IUserRepository>();
             _validatorMock = new Mock<IValidator<RegisterUserCommand>>();
             _loggerMock = new Mock<ILogger<RegisterUserCommandHandler>>();
+            _emailConfirmTokenService = new Mock<IEmailConfirmTokenService>();
             _messageServiceMock = new Mock<IMessageService>();
             
             _handler = new RegisterUserCommandHandler(
                 _userRepositoryMock.Object,
                 _validatorMock.Object,
                 _loggerMock.Object,
+                _emailConfirmTokenService.Object,
                 _messageServiceMock.Object);
         }
 
@@ -43,7 +47,8 @@ namespace EventFlow.Tests
                 "User",
                 "test@example.com",
                 "Password123!",
-                "1234567890"
+                "1234567890",
+                "url"
             );
 
             var validationResult = new FluentValidation.Results.ValidationResult();
@@ -71,7 +76,8 @@ namespace EventFlow.Tests
                 "User",
                 "wq@qwamse.ru",
                 "Password123!",
-                "1234567890"
+                "1234567890",
+                "url"
             );
 
             var validationResult = new FluentValidation.Results.ValidationResult();
@@ -101,7 +107,8 @@ namespace EventFlow.Tests
                 "User",
                 "test@example.com",
                 "Password123!",
-                "1234567890"
+                "1234567890",
+                "url"
             );
 
             var validationResult = new FluentValidation.Results.ValidationResult();
@@ -112,9 +119,8 @@ namespace EventFlow.Tests
             _userRepositoryMock.Setup(r => r.ExistsByEmailAsync(command.Email))
                               .ReturnsAsync(false);
             
-            var identityResult = Microsoft.AspNetCore.Identity.IdentityResult.Failed(
-                new Microsoft.AspNetCore.Identity.IdentityError { Code = "Error1", Description = "Something went wrong" }
-            );
+            var identityResult = IdentityResult.Failed(
+                new IdentityError { Code = "Error1", Description = "Something went wrong" });
             
             _userRepositoryMock.Setup(r => r.AddAsync(It.IsAny<User>(), command.Password))
                               .ReturnsAsync(identityResult);
@@ -138,28 +144,38 @@ namespace EventFlow.Tests
                 "User",
                 "admin@eventflow.com",
                 "Password123!",
-                "1234567890"
+                "1234567890",
+                "url"
             );
-
+            var user = new User()
+            {
+                UserName = command.UserName,
+                FirstName = command.FirstName,
+                LastName = command.LastName,
+                Email = command.Email,
+                PhoneNumber = command.PhoneNumber
+            };
             var validationResult = new FluentValidation.Results.ValidationResult();
 
             _validatorMock.Setup(v => v.ValidateAsync(command, It.IsAny<CancellationToken>()))
                          .ReturnsAsync(validationResult);
-            
             _userRepositoryMock.Setup(r => r.ExistsByEmailAsync(command.Email))
                               .ReturnsAsync(false);
-            
             var identityResult = IdentityResult.Success;
-            
-            _userRepositoryMock.Setup(r => r.AddAsync(It.IsAny<User>(), command.Password))
-                              .ReturnsAsync(identityResult);
-
+            _userRepositoryMock.Setup(r => r.AddAsync(It.Is<User>(u => u.Email == command.Email && u.UserName == command.UserName)
+                , command.Password))
+                .ReturnsAsync(identityResult);
+            _emailConfirmTokenService.Setup(r => r.GenerateAsync(user.Id))
+                .ReturnsAsync("");
+            _messageServiceMock.Setup(r => r.SendEmailAsync(user.Email, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()));
             // Act
             var result = await _handler.Handle(command, CancellationToken.None);
 
             // Assert
             Assert.True(result.IsSuccess);
             _userRepositoryMock.Verify(r => r.AddAsync(It.IsAny<User>(), command.Password), Times.Once);
+            _emailConfirmTokenService.Verify(r => r.GenerateAsync(It.IsAny<Guid>()), Times.Once);
+            _messageServiceMock.Verify(r => r.SendEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()),Times.Once);
         }
     }
 }

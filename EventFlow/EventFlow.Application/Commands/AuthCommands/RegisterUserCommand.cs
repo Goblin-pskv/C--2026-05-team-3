@@ -10,6 +10,7 @@ namespace EventFlow.Application.Commands.RegisterCommand
         string LastName,
         string Email,
         string Password,
-        string PhoneNumber
+        string PhoneNumber,
+        string? urlToController
     ) : IRequest<Result>;
 }

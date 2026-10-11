@@ -7,6 +7,6 @@ namespace EventFlow.Application.Interfaces
 {
     public interface ITokenService
     {
-        Task<string> GenerateTokenAsync(User user);
+        Task<(string accessToken, DateTime expiresAt)> GenerateTokenAsync(User user);
     }
 }
