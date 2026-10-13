@@ -102,6 +102,8 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddScoped(typeof(IEventRepository), typeof(EventRepository));
 builder.Services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
 builder.Services.AddScoped(typeof(IRepository<>), typeof(BaseRepository<>));
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+builder.Services.AddScoped<ITicketRepository, TicketRepository>();
 builder.Services.AddScoped(typeof(IRegistrationRepository), typeof(RegistrationRepository));
 builder.Services.AddScoped<RegisterUserCommandHandler>();
 builder.Services.AddScoped<UpdateProfileCommandHandler>();
