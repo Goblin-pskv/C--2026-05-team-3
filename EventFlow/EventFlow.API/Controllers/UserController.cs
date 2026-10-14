@@ -10,12 +10,10 @@ namespace EventFlow.API.Controllers
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class UserController : BaseController
     {
-        private readonly IMediator _mediator;
-        public UserController(IMediator mediator)
+        public UserController(IMediator mediator) : base(mediator)
         {
-            _mediator = mediator;
         }
         /// <summary>
         /// Обновление профиля пользователя
@@ -25,28 +23,16 @@ namespace EventFlow.API.Controllers
         [HttpPut("UpdateUserProfile")]
         public async Task<IActionResult> UpdateUserProfileCommand([FromBody] UpdateProfileCommand command)
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId = GetUserId();
 
-            if (string.IsNullOrEmpty(userId))
+            if (userId == null)
                 return Unauthorized("Пользователь не авторизован");
 
-            var commandWithGuid = command with { UserId = Guid.Parse(userId) };
+            var commandWithGuid = command with { UserId = userId.Value };
 
             var result = await _mediator.Send(commandWithGuid);
 
-            if (!result.IsSuccess)
-            {
-                switch (result.StatusCode)
-                {
-                    case 400:
-                        return BadRequest(result.Message);
-                    case 409:
-                        return Conflict(result.Message);
-                    case 422:
-                        return UnprocessableEntity(result.Message);
-                }
-            }
-            return Ok(result.Message);
+            return HandleResult(result);
         }
         /// <summary>
         /// Получение данных профиля пользователя
@@ -55,15 +41,13 @@ namespace EventFlow.API.Controllers
         [HttpGet("GetProfile")]
         public async Task<IActionResult> GetProfileCommand()
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId))
+            var userId = GetUserId();
+            if (userId == null)
                 return Unauthorized("Пользователь не авторизован");
-            var command = new GetProfileQuery(Guid.Parse(userId));
+            var command = new GetProfileQuery(userId.Value);
             var result = await _mediator.Send(command);
 
-            if (!result.IsSuccess)
-                return BadRequest(result.Message);
-            return Ok(result.Message);
+            return HandleResult(result);
         }
     }
 }

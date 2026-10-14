@@ -13,40 +13,27 @@ namespace EventFlow.API.Controllers
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class RegistrationController : ControllerBase
+    public class RegistrationController : BaseController
     {
-        private readonly IMediator _mediator;
-
-        public RegistrationController(IMediator mediator)
+        public RegistrationController(IMediator mediator) : base(mediator)
         {
-            _mediator = mediator;
         }
         /// <summary>
         /// Регистрация на мероприятие
         /// </summary>
         /// <param name="eventId"></param>
-        /// <param name="command"></param>
         /// <returns></returns>
         [HttpPost("{eventId}")]
         public async Task<IActionResult> CreateRegistrationCommand(Guid eventId)
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (!Guid.TryParse(userId, out Guid userGuid))
+            var userId = GetUserId();
+            
+            if (userId == null)
                 return Unauthorized("Пользователь не авторизован");
-            var command = new CreateRegistrationCommand(eventId, userGuid);
+                
+            var command = new CreateRegistrationCommand(eventId, userId.Value);
             Result? result = await _mediator.Send(command);
-            if (!result.IsSuccess)
-            {
-                switch (result.StatusCode)
-                {
-                    case 400:
-                        return BadRequest(result.Message);
-                    case 404:
-                        return NotFound(result.Message);
-                }
-            }
-            return Ok(result.Message);
+            return HandleResult(result);
         }
         /// <summary>
         /// Отмена регистрации на мероприятие
@@ -57,55 +44,36 @@ namespace EventFlow.API.Controllers
         [HttpDelete("{eventId}")]
         public async Task<IActionResult> CancelRegistrationCommand(Guid eventId)
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (!Guid.TryParse(userId, out Guid userGuid))
+            var userId = GetUserId();
+            
+            if (userId == null)
                 return Unauthorized("Пользователь не авторизован");
-            var command = new CancelRegistrationCommand(eventId, userGuid);
+                
+            var command = new CancelRegistrationCommand(eventId, userId.Value);
             Result? result = await _mediator.Send(command);
-            if (!result.IsSuccess)
-            {
-                switch (result.StatusCode)
-                {
-                    case 400:
-                        return BadRequest(result.Message);
-                    case 404:
-                        return NotFound(result.Message);
-                }
-            }
-            return Ok(result.Message);
+            return HandleResult(result);
         }
         /// <summary>
         /// Получить список своих регистраций на мероприятия
         /// </summary>
-        /// <param name="command"></param>
         /// <returns></returns>
         [HttpGet("my")]
         public async Task<IActionResult> GetUserRegistrationsQuery()
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (!Guid.TryParse(userId, out Guid userGuid))
+            var userId = GetUserId();
+            
+            if (userId == null)
                 return Unauthorized("Пользователь не авторизован");
 
-            var query = new GetUserRegistrationsQuery(userGuid);
+            var query = new GetUserRegistrationsQuery(userId.Value);
             var result = await _mediator.Send(query);
 
-            if (!result.IsSuccess)
-            {
-                switch (result.StatusCode)
-                {
-                    case 400:
-                        return BadRequest(result.Message);
-                    case 404:
-                        return NotFound(result.Message);
-                }
-            }
-            return Ok(result);
+            return HandleResult(result);
         }
         /// <summary>
         /// Получить список зарегестрировавшихся на мероприятие
         /// </summary>
         /// <param name="eventId"></param>
-        /// <param name="command"></param>
         /// <returns></returns>
         [Authorize(Roles = "Organizer, Admin")]
         [HttpGet("{eventId}/all")]
@@ -114,17 +82,7 @@ namespace EventFlow.API.Controllers
             var query = new GetEventRegistrationsQuery(eventId);
             var result = await _mediator.Send(query);
 
-            if (!result.IsSuccess)
-            {
-                switch (result.StatusCode)
-                {
-                    case 400:
-                        return BadRequest(result.Message);
-                    case 404:
-                        return NotFound(result.Message);
-                }
-            }
-            return Ok(result);
+            return HandleResult(result);
         }
     }
 }

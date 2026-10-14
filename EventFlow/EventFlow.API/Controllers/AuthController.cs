@@ -18,14 +18,12 @@ namespace EventFlow.API.Controllers
 
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthController : ControllerBase
+    public class AuthController : BaseController
     {
-        private readonly IMediator _mediator;
-
-        public AuthController(IMediator mediator)
+        public AuthController(IMediator mediator) : base(mediator)
         {
-            _mediator = mediator;
         }
+        
         /// <summary>
         /// Регистрация нового пользователя
         /// </summary>
@@ -38,20 +36,9 @@ namespace EventFlow.API.Controllers
             var commandWith = command with { urlToController = url };
             var result = await _mediator.Send(commandWith);
 
-            if (!result.IsSuccess)
-            {
-                switch (result.StatusCode)
-                {
-                    case 400:
-                        return BadRequest(result.Message);
-                    case 409:
-                        return Conflict(result.Message);
-                    case 422:
-                        return UnprocessableEntity(result.Message);
-                }
-            }
-            return Ok(result.Message);
+            return HandleResult(result);
         }
+        
         /// <summary>
         /// Авторизация по Email и паролю
         /// </summary>
@@ -62,42 +49,33 @@ namespace EventFlow.API.Controllers
         {
             var result = await _mediator.Send(command);
 
-            if (!result.IsSuccess)
-                switch(result.StatusCode)
-                {
-                    case 400:
-                        return BadRequest(result.Message);
-                    case 404:
-                        return NotFound(result.Message);
-                    case 422:
-                        return UnprocessableEntity(result.Message);
-                }
-
-            return Ok(result.Value);
+            return HandleResult<AuthResponseDto>(result);
         }
+        /// <summary>
+        /// Обновление токена авторизации
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
         [HttpPost("refresh")]
         public async Task<IActionResult> Refresh([FromBody] RefreshUserCommand command)
         {
             var result = await _mediator.Send(command);
-            if (!result.IsSuccess)
-                switch (result.StatusCode)
-                {
-                    case 401:
-                        return Unauthorized(result.Message);
-                }
-            return Ok(result);
+
+            return HandleResult<AuthResponseDto>(result);
         }
+        /// <summary>
+        /// Подтверждение email
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
         [HttpGet("confirm-email", Name = "ConfirmEmail")]
         public async Task<IActionResult> ConfirmEmail([FromQuery] string userId, string token)
         {
             var command = new ConfirmEmailCommand(Guid.Parse(userId), token);
             var result = await _mediator.Send(command);
-            switch (result.StatusCode)
-            {
-                case 400:
-                    return NotFound(result.Message);
-            }
-            return Ok(result.Message);
+
+            return HandleResult(result);
         }
     }
 }

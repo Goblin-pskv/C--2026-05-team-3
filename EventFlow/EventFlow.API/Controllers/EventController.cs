@@ -12,13 +12,10 @@ namespace EventFlow.API.Controllers
     [Authorize(Roles = "Organizer, Admin")]
     [Route("api/[controller]")]
     [ApiController]
-    public class EventController : ControllerBase
+    public class EventController : BaseController
     {
-        private readonly IMediator _mediator;
-
-        public EventController(IMediator mediator)
+        public EventController(IMediator mediator) : base(mediator)
         {
-            _mediator = mediator;
         }
         /// <summary>
         /// Создание нового мероприятия
@@ -29,17 +26,7 @@ namespace EventFlow.API.Controllers
         public async Task<IActionResult> CreateEventCommand([FromBody] CreateEventCommand command)
         {
             Result? result = await _mediator.Send(command);
-            if (!result.IsSuccess)
-            {
-                switch (result.StatusCode)
-                {
-                    case 400:
-                        return BadRequest(result.Message);
-                    case 422:
-                        return UnprocessableEntity(result.Message);
-                }
-            }
-            return Ok(result.Message);
+            return HandleResult(result);
         }
         /// <summary>
         /// Получение данных о мероприятии
@@ -52,17 +39,7 @@ namespace EventFlow.API.Controllers
         {
             var query = new GetEventQuery { EventId = eventId };
             var result = await _mediator.Send(query);
-            if (!result.IsSuccess)
-            {
-                switch (result.StatusCode)
-                {
-                    case 400:
-                        return BadRequest(result.Message);
-                    case 404:
-                        return NotFound(result.Message);
-                }
-            }
-            return Ok(result);
+            return HandleResult(result);
         }
         /// <summary>
         /// Обновление данных мероприятия
@@ -75,19 +52,7 @@ namespace EventFlow.API.Controllers
         {
             var commandWithGuid = command with { EventId = eventId};
             Result? result = await _mediator.Send(commandWithGuid);
-            if (!result.IsSuccess)
-            {
-                switch (result.StatusCode)
-                {
-                    case 400:
-                        return BadRequest(result.Message);
-                    case 404:
-                        return NotFound(result.Message);
-                    case 422:
-                        return UnprocessableEntity(result.Message);
-                }
-            }
-            return Ok(result.Message);
+            return HandleResult(result);
         }
     }
 }

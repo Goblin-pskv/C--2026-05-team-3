@@ -11,7 +11,7 @@ using System.Text;
 
 namespace EventFlow.Application.Commands.AuthCommands
 {
-    public class RefreshUserCommandHandler : IRequestHandler<RefreshUserCommand, Result>
+    public class RefreshUserCommandHandler : IRequestHandler<RefreshUserCommand, Result<AuthResponseDto>>
     {
         private readonly ITokenService _tokenService;
         private readonly IRefreshTokenService _refreshTokenService;
@@ -25,7 +25,7 @@ namespace EventFlow.Application.Commands.AuthCommands
             _tokenHasher = tokenHasher;
             _logger = logger;
         }
-        public async Task<Result> Handle(RefreshUserCommand request, CancellationToken cancellationToken)
+        public async Task<Result<AuthResponseDto>> Handle(RefreshUserCommand request, CancellationToken cancellationToken)
         {
             string refreshToken = _tokenHasher.Hash(request.refresh);
             _logger.LogInformation("Обновление токена начато для refresh:{refresh}", refreshToken);
@@ -33,7 +33,7 @@ namespace EventFlow.Application.Commands.AuthCommands
             if (user is null)
             {
                 _logger.LogInformation("не найден действующий refresh:{refresh}",refreshToken);
-                return Result.Failure("Не верный токен", 401);
+                return Result<AuthResponseDto>.Failure("Не верный токен", 401);
             }
             var (accessToken, expiresAt) = await _tokenService.GenerateTokenAsync(user!);
             _logger.LogInformation("Сгенерирован новый токен для:{refresh}", refreshToken);
