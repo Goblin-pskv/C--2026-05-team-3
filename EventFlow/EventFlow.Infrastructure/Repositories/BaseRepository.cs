@@ -112,7 +112,7 @@ namespace EventFlow.Infrastructure.Repositories
         /// сущностей нужно явно вызвать Update.
         /// </summary>
         /// <param name="entity">Сущность с измененными данными</param>
-        public void UpdateAsync(T entity, CancellationToken ct)
+        public async Task UpdateAsync(T entity, CancellationToken ct)
         {
             _dbSet.Update(entity);
         }

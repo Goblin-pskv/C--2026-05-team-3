@@ -63,7 +63,7 @@ namespace EventFlow.Application.Commands.EventCommands
 
             try
             {
-                _eventRepository.UpdateAsync(existingEvent, cancellationToken);
+                await _eventRepository.UpdateAsync(existingEvent, cancellationToken);
                 await _eventRepository.SaveChangesAsync(cancellationToken);
 
                 _logger.LogInformation("Мероприятие {Title} (Id: {Id}) успешно обновлено", request.Title, request.EventId);

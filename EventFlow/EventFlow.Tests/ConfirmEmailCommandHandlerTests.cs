@@ -34,7 +34,7 @@ namespace EventFlow.Tests
             var token = "fake-token";
             var command = new ConfirmEmailCommand(userId, token);
 
-            _emailConfirmTokenServiceMock.Setup(s => s.ConfirmEmail(userId, token))
+            _emailConfirmTokenServiceMock.Setup(s => s.ConfirmEmail(userId, token, It.IsAny<CancellationToken>()))
                                          .ReturnsAsync(false);
 
             // Act
@@ -54,7 +54,7 @@ namespace EventFlow.Tests
             var token = "fake-token";
             var command = new ConfirmEmailCommand(userId, token);
 
-            _emailConfirmTokenServiceMock.Setup(s => s.ConfirmEmail(userId, token))
+            _emailConfirmTokenServiceMock.Setup(s => s.ConfirmEmail(userId, token, It.IsAny<CancellationToken>()))
                                          .ReturnsAsync(true);
 
             // Act
@@ -74,7 +74,7 @@ namespace EventFlow.Tests
             var token = "fake-token";
             var command = new ConfirmEmailCommand(userId, token);
 
-            _emailConfirmTokenServiceMock.Setup(s => s.ConfirmEmail(userId, token))
+            _emailConfirmTokenServiceMock.Setup(s => s.ConfirmEmail(userId, token, It.IsAny<CancellationToken>()))
                                          .ThrowsAsync(new Exception("Test exception"));
 
             // Act

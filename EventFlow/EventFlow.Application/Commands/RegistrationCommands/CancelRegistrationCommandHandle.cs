@@ -80,7 +80,7 @@ namespace EventFlow.Application.Commands.RegistrationCommands
 
             try
             {
-                _registrationRepository.UpdateAsync(registration, cancellationToken);
+                await _registrationRepository.UpdateAsync(registration, cancellationToken);
                 await _registrationRepository.SaveChangesAsync(cancellationToken);
 
                 _logger.LogInformation(

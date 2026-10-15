@@ -98,8 +98,14 @@ namespace EventFlow.Infrastructure.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
+                    b.Property<bool>("IsDelete")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("IsVerified")
                         .HasColumnType("boolean");
+
+                    b.Property<string>("Reason")
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");

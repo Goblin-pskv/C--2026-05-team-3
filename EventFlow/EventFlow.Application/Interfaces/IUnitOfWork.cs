@@ -38,18 +38,18 @@ public interface IUnitOfWork : IDisposable
     /// Используется для группировки нескольких операций.
     /// </summary>
     /// <returns>Объект транзакции для управления</returns>
-    Task BeginTransactionAsync();
+    Task BeginTransactionAsync(CancellationToken ct);
 
     /// <summary>
     /// Зафиксировать транзакцию (COMMIT).
     /// Все изменения сохраняются в БД.
     /// </summary>
-    Task CommitAsync();
+    Task CommitAsync(CancellationToken ct);
 
     /// <summary>
     /// Откатить транзакцию (ROLLBACK).
     /// Все изменения отменяются.
     /// Вызывается при ошибке.
     /// </summary>
-    Task RollbackAsync();
+    Task RollbackAsync( CancellationToken ct);
 }

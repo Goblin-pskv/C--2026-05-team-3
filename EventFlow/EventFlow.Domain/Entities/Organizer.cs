@@ -1,6 +1,7 @@
 ﻿using EventFlow.Domain.Common;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace EventFlow.Domain.Entities
@@ -36,6 +37,8 @@ namespace EventFlow.Domain.Entities
         /// </summary>
         public bool IsVerified { get; set; }
 
+        public bool IsDelete { get; set; } = false;
+        public string? Reason { get; set; }
         /// <summary>
         /// Пользователь, которому принадлежит этот профиль.
         /// Навигационное свойство для EF Core.
@@ -48,5 +51,7 @@ namespace EventFlow.Domain.Entities
         /// Связь: один Organizer может создать много Events (1:N)
         /// </summary>
         public virtual ICollection<Event> Events { get; set; } = new List<Event>();
+        [NotMapped]
+        public int EventsCount{ get; set; }
     }
 }

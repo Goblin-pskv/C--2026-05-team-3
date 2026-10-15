@@ -61,5 +61,7 @@ namespace EventFlow.Application.Interfaces
         /// <param name="user">Пользователь с измененными данными</param>
         Task<IdentityResult> Update(User user);
         Task<bool> CheckPasswordAsync(User user, string password);
+        Task<IdentityResult> AddNewRole(User user, string role);
+        Task<bool> IsInRoleAsync(User user, string role);
     }
 }

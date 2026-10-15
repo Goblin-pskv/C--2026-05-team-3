@@ -14,7 +14,7 @@ namespace EventFlow.Application.Interfaces
 
         Task AddAsync(T entity, CancellationToken ct);
 
-        void UpdateAsync(T item, CancellationToken ct);
+        Task UpdateAsync(T item, CancellationToken ct);
 
         void Delete(T entity, CancellationToken ct);
 

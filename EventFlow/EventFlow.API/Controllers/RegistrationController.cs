@@ -39,7 +39,6 @@ namespace EventFlow.API.Controllers
         /// Отмена регистрации на мероприятие
         /// </summary>
         /// <param name="eventId"></param>
-        /// <param name="command"></param>
         /// <returns></returns>
         [HttpDelete("{eventId}")]
         public async Task<IActionResult> CancelRegistrationCommand(Guid eventId)

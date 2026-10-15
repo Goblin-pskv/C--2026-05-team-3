@@ -12,18 +12,21 @@ namespace EventFlow.Application.Commands.RegisterCommand
     public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, Result>
     {
         private readonly IUserRepository _userRepository;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IValidator<RegisterUserCommand> _validator;
         private readonly ILogger<RegisterUserCommandHandler> _logger;
         private readonly IEmailConfirmTokenService _emailConfirmTokenService;
         private readonly IMessageService _emailService;
 
         public RegisterUserCommandHandler(IUserRepository userRepository,
+                                          IUnitOfWork unitOfWork,
                                           IValidator<RegisterUserCommand> validator,
                                           ILogger<RegisterUserCommandHandler> logger,
                                           IEmailConfirmTokenService emailConfirmTokenService,
                                           IMessageService messageService)
         {
             _userRepository = userRepository;
+            _unitOfWork = unitOfWork;
             _validator = validator;
             _logger = logger;
             _emailConfirmTokenService = emailConfirmTokenService;
@@ -64,22 +67,46 @@ namespace EventFlow.Application.Commands.RegisterCommand
                 PhoneNumber = request.PhoneNumber,
             };
 
-            var result = await _userRepository.AddAsync(user, request.Password);
-            if (!result.Succeeded)
+            try
             {
-                var errors = string.Join(',', result.Errors.Select(e => $"{e.Code}: {e.Description}"));
-
-                _logger.LogWarning(
-                    "Ошибка при регистрации для {Email}: {Error}",
-                    request.Email,
-                    errors);
-
-                return Result<AuthResponseDto>.Failure(errors, 400);
+                await _unitOfWork.BeginTransactionAsync(ct);
+                var addUserResult = await _userRepository.AddAsync(user,request.Password);
+                if(!addUserResult.Succeeded)
+                {
+                    throw new Exception("Не удалось добавить нового пользователя");
+                }
+                var addRole = await _userRepository.AddNewRole(user, "user");
+                if(!addRole.Succeeded)
+                {
+                    throw new Exception("Не удалось добавить роль для нового пользователя");
+                }
+                await _unitOfWork.CommitAsync(ct);
             }
-            var token = await _emailConfirmTokenService.GenerateAsync(user.Id);
-            await _emailService.SendEmailAsync(user.Email, "Подтверждение регистрации на EventFlow", 
-                $@"Регистрация успешно завершена. Перейдите по ссылке, чтобы подтвердить свою регистрацию:{request.urlToController}?userId={Uri.EscapeDataString(user.Id.ToString())}&token={Uri.EscapeDataString(token)}", ct);
-            return Result.Success();
+            catch(Exception ex)
+            {
+                try
+                {
+                    await _unitOfWork.RollbackAsync(ct);
+                }
+                catch(Exception rollbackEx)
+                {
+                    _logger.LogError(rollbackEx, "Не удалось откатить транзакцию при регистрации нового пользователя");
+                }
+                _logger.LogError(ex, "Произошла ошибка при регистрации нового пользователя для {email}", request.Email);
+                return Result.Failure("Ошибка при регистрации для ", 400);
+            }
+            _logger.LogInformation("Пользователь с email:{email} успешно создан", request.Email);
+            try
+            {
+                var token = await _emailConfirmTokenService.GenerateAsync(user.Id, ct);
+                await _emailService.SendEmailAsync(user.Email, "Подтверждение регистрации на EventFlow",
+                    $@"Регистрация успешно завершена. Перейдите по ссылке, чтобы подтвердить свою регистрацию:{request.urlToController}?userId={Uri.EscapeDataString(user.Id.ToString())}&token={Uri.EscapeDataString(token)}", ct);
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, "Пользователь {Email} создан, но письмо не отправлено", request.Email);
+            }
+            return Result.Success(200, "Пользователь создан");
         }
     }
 }

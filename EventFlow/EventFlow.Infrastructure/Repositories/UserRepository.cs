@@ -25,29 +25,7 @@ namespace EventFlow.Infrastructure.Repositories
         }
         public async Task<IdentityResult> AddAsync(User user, string password)
         {
-            await using var transaction = await _context.Database.BeginTransactionAsync();
-            try
-            {
-                var createdUserResult = await _userManager.CreateAsync(user, password);
-                if(!createdUserResult.Succeeded)
-                {
-                    await transaction.RollbackAsync();
-                    return createdUserResult;
-                }
-                var setRoleResult = await _userManager.AddToRoleAsync(user, "User");
-                if(!setRoleResult.Succeeded)
-                {
-                    await transaction.RollbackAsync();
-                    return setRoleResult;
-                }
-                await transaction.CommitAsync();
-                return IdentityResult.Success;
-            }
-            catch
-            {
-                await transaction.RollbackAsync();
-                throw;
-            }
+            return await _userManager.CreateAsync(user, password);    
         }
 
         public async Task<bool> CheckPasswordAsync(User user, string password)
@@ -73,8 +51,26 @@ namespace EventFlow.Infrastructure.Repositories
             return await _userManager.Users.FirstOrDefaultAsync(u => u.Id == id);
         }
 
+        public async Task<IList<string>> GetUserRoles(Guid userId)
+        {
+            IList<string> roles = new List<string>();
+            var user = await GetByIdAsync(userId);
+            roles = await _userManager.GetRolesAsync(user!);
+            return roles;
+        }
+
+        public async Task<IdentityResult> AddNewRole(User user, string role)
+        {
+            return await _userManager.AddToRoleAsync(user, role);
+        }
+
+        public async Task<bool> IsInRoleAsync(User user, string role)
+        {
+            return await _userManager.IsInRoleAsync(user, role);
+        }
         public async Task<IdentityResult> Update(User user)
         {
+
             return await _userManager.UpdateAsync(user);
         }
     }

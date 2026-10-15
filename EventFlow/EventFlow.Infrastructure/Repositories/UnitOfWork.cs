@@ -43,23 +43,23 @@ public class UnitOfWork : IUnitOfWork
     /// Начать новую транзакцию.
     /// Все последующие операции будут выполняться в рамках этой транзакции.
     /// </summary>
-    public async Task BeginTransactionAsync()
+    public async Task BeginTransactionAsync(CancellationToken ct)
     {
-        _transaction = await _context.Database.BeginTransactionAsync();
+        _transaction = await _context.Database.BeginTransactionAsync(ct);
     }
 
     /// <summary>
     /// Зафиксировать транзакцию (COMMIT).
     /// Все изменения сохраняются в БД.
     /// </summary>
-    public async Task CommitAsync()
+    public async Task CommitAsync(CancellationToken ct)
     {
         if (_transaction == null)
             throw new InvalidOperationException("Транзакция не была начата");
 
         try
         {
-            await _transaction.CommitAsync();
+            await _transaction.CommitAsync(ct);
         }
         finally
         {
@@ -79,14 +79,14 @@ public class UnitOfWork : IUnitOfWork
         GC.SuppressFinalize(this);
     }
 
-    public async Task RollbackAsync()
+    public async Task RollbackAsync(CancellationToken ct)
     {
         if (_transaction == null)
             throw new InvalidOperationException("Транзакция не была начата");
 
         try
         {
-            await _transaction.RollbackAsync();
+            await _transaction.RollbackAsync(ct);
         }
 
         finally

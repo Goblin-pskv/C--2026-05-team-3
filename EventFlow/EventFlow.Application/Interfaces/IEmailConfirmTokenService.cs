@@ -6,7 +6,7 @@ namespace EventFlow.Application.Interfaces
 {
     public interface IEmailConfirmTokenService
     {
-        Task<string> GenerateAsync(Guid userId);
-        Task<bool> ConfirmEmail(Guid userId, string token);
+        Task<string> GenerateAsync(Guid userId, CancellationToken ct);
+        Task<bool> ConfirmEmail(Guid userId, string token, CancellationToken ct);
     }
 }

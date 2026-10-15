@@ -19,11 +19,13 @@ namespace EventFlow.Tests
         private readonly Mock<ILogger<RegisterUserCommandHandler>> _loggerMock;
         private readonly Mock<IEmailConfirmTokenService> _emailConfirmTokenService;
         private readonly Mock<IMessageService> _messageServiceMock;
+        private readonly Mock<IUnitOfWork> _unitOfWork;
         private readonly RegisterUserCommandHandler _handler;
 
         public RegisterUserCommandHandlerTests()
         {
             _userRepositoryMock = new Mock<IUserRepository>();
+            _unitOfWork = new Mock<IUnitOfWork>();
             _validatorMock = new Mock<IValidator<RegisterUserCommand>>();
             _loggerMock = new Mock<ILogger<RegisterUserCommandHandler>>();
             _emailConfirmTokenService = new Mock<IEmailConfirmTokenService>();
@@ -31,6 +33,7 @@ namespace EventFlow.Tests
             
             _handler = new RegisterUserCommandHandler(
                 _userRepositoryMock.Object,
+                _unitOfWork.Object,
                 _validatorMock.Object,
                 _loggerMock.Object,
                 _emailConfirmTokenService.Object,
@@ -165,7 +168,7 @@ namespace EventFlow.Tests
             _userRepositoryMock.Setup(r => r.AddAsync(It.Is<User>(u => u.Email == command.Email && u.UserName == command.UserName)
                 , command.Password))
                 .ReturnsAsync(identityResult);
-            _emailConfirmTokenService.Setup(r => r.GenerateAsync(user.Id))
+            _emailConfirmTokenService.Setup(r => r.GenerateAsync(user.Id, It.IsAny<CancellationToken>()))
                 .ReturnsAsync("");
             _messageServiceMock.Setup(r => r.SendEmailAsync(user.Email, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()));
             // Act
@@ -174,7 +177,7 @@ namespace EventFlow.Tests
             // Assert
             Assert.True(result.IsSuccess);
             _userRepositoryMock.Verify(r => r.AddAsync(It.IsAny<User>(), command.Password), Times.Once);
-            _emailConfirmTokenService.Verify(r => r.GenerateAsync(It.IsAny<Guid>()), Times.Once);
+            _emailConfirmTokenService.Verify(r => r.GenerateAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Once);
             _messageServiceMock.Verify(r => r.SendEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()),Times.Once);
         }
     }

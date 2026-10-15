@@ -23,13 +23,13 @@ namespace EventFlow.Application.Commands.AuthCommands
             _logger = logger;
         }
 
-        public async Task<Result> Handle(ConfirmEmailCommand request, CancellationToken cancellationToken)
+        public async Task<Result> Handle(ConfirmEmailCommand request, CancellationToken ct)
         {
             try
             {
                 _logger.LogInformation("Подтверждение email для пользователя {UserId}", request.userId);
                 
-                var isConfirmed = await _emailConfirmTokenService.ConfirmEmail(request.userId, request.token);
+                var isConfirmed = await _emailConfirmTokenService.ConfirmEmail(request.userId, request.token, ct);
                 
                 if (!isConfirmed)
                 {

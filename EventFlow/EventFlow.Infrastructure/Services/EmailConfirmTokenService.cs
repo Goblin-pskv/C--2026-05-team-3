@@ -14,15 +14,15 @@ namespace EventFlow.Infrastructure.Services
         {
             _userManager = userManager;
         }
-        public async Task<string> GenerateAsync(Guid userId)
+        public async Task<string> GenerateAsync(Guid userId, CancellationToken ct)
         {
-            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId)
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId, cancellationToken: ct)
                 ?? throw new InvalidOperationException("Пользователь не найден");
             return await _userManager.GenerateEmailConfirmationTokenAsync(user);
         }
-        public async Task<bool> ConfirmEmail(Guid userId, string token)
+        public async Task<bool> ConfirmEmail(Guid userId, string token, CancellationToken ct)
         {
-            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId, cancellationToken: ct);
             if (user is null || user.EmailConfirmed) return false;
             var result = await _userManager.ConfirmEmailAsync(user, token);
             return result.Succeeded;

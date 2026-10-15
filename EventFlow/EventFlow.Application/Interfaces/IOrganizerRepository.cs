@@ -16,15 +16,8 @@ namespace EventFlow.Application.Interfaces
     /// - При отображении информации об организаторе на странице мероприятия
     /// - При верификации организатора администратором
     /// </summary>
-    public interface IOrganizerRepository
+    public interface IOrganizerRepository : IRepository<Organizer>
     {
-        /// <summary>
-        /// Получить профиль организатора по ID.
-        /// </summary>
-        /// <param name="id">UUID профиля организатора</param>
-        /// <returns>Профиль организатора или null</returns>
-        Task<Organizer?> GetByIdAsync(Guid id);
-
         /// <summary>
         /// Получить профиль организатора по ID пользователя.
         /// Используется для проверки, является ли пользователь организатором.
@@ -36,24 +29,12 @@ namespace EventFlow.Application.Interfaces
         /// if (organizer == null)
         ///     throw new DomainException("Пользователь не является организатором");
         /// </example>
-        Task<Organizer?> GetByUserIdAsync(Guid userId);
+        Task<Organizer?> GetByUserIdAsync(Guid userId, CancellationToken ct);
 
         /// <summary>
-        /// Добавить новый профиль организатора.
-        /// Вызывается, когда пользователь становится организатором.
+        /// Получить все неверифицированные профили организаторов (для администратора).
         /// </summary>
-        /// <param name="organizer">Профиль организатора</param>
-        Task AddAsync(Organizer organizer);
-
-        /// <summary>
-        /// Обновить данные профиля организатора.
-        /// </summary>
-        /// <param name="organizer">Профиль с измененными данными</param>
-        void Update(Organizer organizer);
-
-        /// <summary>
-        /// Сохранить все изменения в базе данных.
-        /// </summary>
-        Task SaveChangesAsync();
+        /// <returns>Список неверифицированных профилей организаторов</returns>
+        Task<IEnumerable<Organizer>> GetPendingAsync(int offset, int count, CancellationToken ct);
     }
 }

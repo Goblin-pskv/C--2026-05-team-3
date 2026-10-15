@@ -85,7 +85,7 @@ namespace EventFlow.Application.Commands.RegistrationCommands
                     existing.Status = RegistrationStatus.Confirmed;
                     existing.ConfirmationDate = DateTime.UtcNow;
 
-                    _registrationRepository.UpdateAsync(existing, cancellationToken);
+                    await _registrationRepository.UpdateAsync(existing, cancellationToken);
                     await _registrationRepository.SaveChangesAsync(cancellationToken);
 
                     return Result.Success();
