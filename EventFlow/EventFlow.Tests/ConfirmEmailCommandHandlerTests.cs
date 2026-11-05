@@ -85,5 +85,39 @@ namespace EventFlow.Tests
             Assert.Equal(500, result.StatusCode);
             Assert.Equal("Произошла ошибка при подтверждении email", result.Message);
         }
+
+        [Fact]
+        public async Task Handle_WhenUserIdIsEmpty_ReturnsFailureResult()
+        {
+            // Arrange
+            var userId = Guid.Empty;
+            var token = "fake-token";
+            var command = new ConfirmEmailCommand(userId, token);
+
+            // Act
+            var result = await _handler.Handle(command, CancellationToken.None);
+
+            // Assert
+            Assert.False(result.IsSuccess);
+            Assert.Equal(400, result.StatusCode);
+            Assert.Contains("UserId должен быть заполнен", result.Message);
+        }
+
+        [Fact]
+        public async Task Handle_WhenTokenIsEmpty_ReturnsFailureResult()
+        {
+            // Arrange
+            var userId = Guid.NewGuid();
+            var token = "";
+            var command = new ConfirmEmailCommand(userId, token);
+
+            // Act
+            var result = await _handler.Handle(command, CancellationToken.None);
+
+            // Assert
+            Assert.False(result.IsSuccess);
+            Assert.Equal(400, result.StatusCode);
+            Assert.Contains("Token должен быть заполнен", result.Message);
+        }
     }
 }
