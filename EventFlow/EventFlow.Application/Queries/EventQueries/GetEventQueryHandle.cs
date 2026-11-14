@@ -42,6 +42,7 @@ namespace EventFlow.Application.Queries.EventQueries
 
             var dto = new EventDto
             {
+                Id = eventEntity.Id,
                 Title = eventEntity.Title,
                 Description = eventEntity.Description,
                 Type = eventEntity.Type.ToString(),

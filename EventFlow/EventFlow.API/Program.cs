@@ -101,6 +101,18 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+// Добавляем CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173") // Адрес фронтенда
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
+
 builder.Services.AddScoped(typeof(IEventRepository), typeof(EventRepository));
 builder.Services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
 builder.Services.AddScoped(typeof(IRepository<>), typeof(BaseRepository<>));
@@ -203,7 +215,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseCors("AllowFrontend"); // Используем CORS политику
 app.UseAuthentication();
 app.UseAuthorization();
 

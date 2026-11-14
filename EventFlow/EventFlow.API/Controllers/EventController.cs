@@ -42,6 +42,22 @@ namespace EventFlow.API.Controllers
             return HandleResult(result);
         }
         /// <summary>
+        /// Получение списка мероприятий с пагинацией
+        /// </summary>
+        /// <param name="page">Номер страницы (по умолчанию 0)</param>
+        /// <param name="pageSize">Размер страницы (по умолчанию 10)</param>
+        /// <returns>Список мероприятий</returns>
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<IActionResult> GetEventsListQuery(
+            [FromQuery] int page = 0, 
+            [FromQuery] int pageSize = 10)
+        {
+            var query = new GetEventsListQuery(page, pageSize);
+            var result = await _mediator.Send(query);
+            return HandleResult(result);
+        }
+        /// <summary>
         /// Обновление данных мероприятия
         /// </summary>
         /// <param name="eventId">ID мероприятия</param>

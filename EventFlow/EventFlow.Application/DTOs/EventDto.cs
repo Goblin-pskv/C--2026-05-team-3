@@ -20,6 +20,9 @@ namespace EventFlow.Application.DTOs
     /// </summary>
     public class EventDto
     {
+        /// <summary>Уникальный идентификатор мероприятия</summary>
+        public Guid Id { get; set; }
+
         /// <summary>Название мероприятия</summary>
         public string Title { get; set; } = string.Empty;
 
