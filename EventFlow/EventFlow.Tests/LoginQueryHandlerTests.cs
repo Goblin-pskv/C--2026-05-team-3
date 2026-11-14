@@ -161,5 +161,85 @@ namespace EventFlow.Tests
             _tokenServiceMock.Verify(t => t.GenerateTokenAsync(user), Times.Once);
             _refreshTokenServiceMock.Verify(r => r.GenerateAndSaveRefreshTokenAsync(user.Id), Times.Once);
         }
+
+        [Fact]
+        public async Task Handle_WhenEmailIsEmpty_ReturnsFailureResult()
+        {
+            // Arrange
+            var query = new LoginQuery("", "password123");
+            
+            var validationResult = new FluentValidation.Results.ValidationResult();
+            
+            _validatorMock.Setup(v => v.ValidateAsync(query, It.IsAny<CancellationToken>()))
+                         .ReturnsAsync(validationResult);
+
+            // Act
+            var result = await _handler.Handle(query, CancellationToken.None);
+
+            // Assert
+            Assert.False(result.IsSuccess);
+            Assert.Equal(400, result.StatusCode);
+            Assert.Contains("Email должен быть заполнен", result.Message);
+        }
+
+        [Fact]
+        public async Task Handle_WhenPasswordIsEmpty_ReturnsFailureResult()
+        {
+            // Arrange
+            var query = new LoginQuery("test@example.com", "");
+            
+            var validationResult = new FluentValidation.Results.ValidationResult();
+            
+            _validatorMock.Setup(v => v.ValidateAsync(query, It.IsAny<CancellationToken>()))
+                         .ReturnsAsync(validationResult);
+
+            // Act
+            var result = await _handler.Handle(query, CancellationToken.None);
+
+            // Assert
+            Assert.False(result.IsSuccess);
+            Assert.Equal(400, result.StatusCode);
+            Assert.Contains("Пароль должен быть заполнен", result.Message);
+        }
+
+        [Fact]
+        public async Task Handle_WhenEmailIsNull_ReturnsFailureResult()
+        {
+            // Arrange
+            var query = new LoginQuery(null!, "password123");
+            
+            var validationResult = new FluentValidation.Results.ValidationResult();
+            
+            _validatorMock.Setup(v => v.ValidateAsync(query, It.IsAny<CancellationToken>()))
+                         .ReturnsAsync(validationResult);
+
+            // Act
+            var result = await _handler.Handle(query, CancellationToken.None);
+
+            // Assert
+            Assert.False(result.IsSuccess);
+            Assert.Equal(400, result.StatusCode);
+            Assert.Contains("Email должен быть заполнен", result.Message);
+        }
+
+        [Fact]
+        public async Task Handle_WhenPasswordIsNull_ReturnsFailureResult()
+        {
+            // Arrange
+            var query = new LoginQuery("test@example.com", null!);
+            
+            var validationResult = new FluentValidation.Results.ValidationResult();
+            
+            _validatorMock.Setup(v => v.ValidateAsync(query, It.IsAny<CancellationToken>()))
+                         .ReturnsAsync(validationResult);
+
+            // Act
+            var result = await _handler.Handle(query, CancellationToken.None);
+
+            // Assert
+            Assert.False(result.IsSuccess);
+            Assert.Equal(400, result.StatusCode);
+            Assert.Contains("Пароль должен быть заполнен", result.Message);
+        }
     }
 }

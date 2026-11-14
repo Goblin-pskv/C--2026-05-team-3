@@ -65,5 +65,31 @@ namespace EventFlow.Tests
             Assert.Equal(401, result.StatusCode);
             _tokenServiceMock.Verify(rts => rts.GenerateTokenAsync(It.IsAny<User>()), Times.Never);
         }
+
+        [Fact]
+        public async Task Handle_WhenRefreshTokenIsEmpty_ReturnsFailureResult()
+        {
+            //Arrange
+            var command = new RefreshUserCommand("");
+            //Act
+            var result = await _handler.Handle(command, It.IsAny<CancellationToken>());
+            //Assert
+            Assert.False(result.IsSuccess);
+            Assert.Equal(400, result.StatusCode);
+            Assert.Contains("Refresh token должен быть заполнен", result.Message);
+        }
+
+        [Fact]
+        public async Task Handle_WhenRefreshTokenIsNull_ReturnsFailureResult()
+        {
+            //Arrange
+            var command = new RefreshUserCommand(null!);
+            //Act
+            var result = await _handler.Handle(command, It.IsAny<CancellationToken>());
+            //Assert
+            Assert.False(result.IsSuccess);
+            Assert.Equal(400, result.StatusCode);
+            Assert.Contains("Refresh token должен быть заполнен", result.Message);
+        }
     }
 }
