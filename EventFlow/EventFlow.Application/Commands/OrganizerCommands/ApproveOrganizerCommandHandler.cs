@@ -1,5 +1,6 @@
 using EventFlow.Application.Common;
 using EventFlow.Application.Interfaces;
+using EventFlow.Domain.Entities;
 using EventFlow.Domain.Exceptions;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -8,14 +9,20 @@ namespace EventFlow.Application.Commands.OrganizerCommands
 {
     public class ApproveOrganizerCommandHandler : IRequestHandler<ApproveOrganizerCommand, Result>
     {
+        private readonly IOrganizerRequestRepository _organizerRequestRepository;
         private readonly IOrganizerRepository _organizerRepository;
         private readonly IUserRepository _userRepository;
         private readonly ILogger<ApproveOrganizerCommandHandler> _logger;
         private readonly IUnitOfWork _unitOfWork;
 
         public ApproveOrganizerCommandHandler(
-            IOrganizerRepository organizerRepository, IUserRepository userRepository, ILogger<ApproveOrganizerCommandHandler> logger, IUnitOfWork unitOfWork)
+            IOrganizerRequestRepository organizerRequestRepository,
+            IOrganizerRepository organizerRepository,
+            IUserRepository userRepository,
+            ILogger<ApproveOrganizerCommandHandler> logger,
+            IUnitOfWork unitOfWork)
         {
+            _organizerRequestRepository = organizerRequestRepository;
             _organizerRepository = organizerRepository;
             _userRepository = userRepository;
             _logger = logger;
@@ -25,38 +32,40 @@ namespace EventFlow.Application.Commands.OrganizerCommands
         public async Task<Result> Handle(ApproveOrganizerCommand request, CancellationToken ct)
         {
             _logger.LogInformation("Утверждение заявки организатора с ID: {Id}", request.Id);
-            
-            var organizer = await _organizerRepository.GetByIdAsync(request.Id, ct);
-            if (organizer == null)
+
+            var organizerRequest = await _organizerRequestRepository.GetByIdAsync(request.Id, ct);
+            if (organizerRequest == null)
             {
                 _logger.LogWarning("Заявка организатора с ID {Id} не найдена", request.Id);
                 return Result.Failure("Заявка организатора не найдена", 404);
             }
-            
-            if (organizer.IsVerified)
+
+            if (organizerRequest.Status != Domain.Enums.OrganizerRequestStatus.Pending)
             {
-                _logger.LogWarning("Заявка организатора с ID {Id} уже была утверждена", request.Id);
-                return Result.Failure("Заявка уже была утверждена", 409);
+                _logger.LogWarning("Заявка организатора с ID {Id} уже была рассмотрена", request.Id);
+                return Result.Failure("Заявка уже была рассмотрена", 409);
             }
-            
-            var user = await _userRepository.GetByIdAsync(organizer.UserId);
-            if(user is null)
+
+            var user = await _userRepository.GetByIdAsync(organizerRequest.UserId);
+            if (user is null)
             {
-                _logger.LogWarning("пользователь {Id} не найден", organizer.UserId);
-                return Result.Failure($"Пользователь с Id {organizer.UserId} не найден", 404);
+                _logger.LogWarning("Пользователь {Id} не найден", organizerRequest.UserId);
+                return Result.Failure($"Пользователь с Id {organizerRequest.UserId} не найден", 404);
             }
 
             try
             {
                 await _unitOfWork.BeginTransactionAsync(ct);
-                
-                organizer.IsVerified = true;
-                int affected = await _organizerRepository.SaveChangesAsync(ct);
+
+                organizerRequest.Status = Domain.Enums.OrganizerRequestStatus.Approved;
+                organizerRequest.ReviewedById = request.AdminId;
+                organizerRequest.ReviewedAt = DateTime.UtcNow;
+                int affected = await _organizerRequestRepository.SaveChangesAsync(ct);
                 if (affected == 0)
                 {
-                    throw new Exception("Не удалось сохранить статус организатора");
+                    throw new Exception("Не удалось сохранить статус заявки");
                 }
-                
+
                 bool roleResult = await _userRepository.IsInRoleAsync(user, "organizer");
                 if (!roleResult)
                 {
@@ -66,7 +75,25 @@ namespace EventFlow.Application.Commands.OrganizerCommands
                         throw new Exception($"Не удалось назначить роль организатора пользователю {user.Id}: {string.Join(", ", result.Errors.Select(e => e.Description))}");
                     }
                 }
-                
+
+                // Создаём профиль организатора из данных заявки
+                if (!string.IsNullOrEmpty(organizerRequest.Data))
+                {
+                    var requestData = System.Text.Json.JsonSerializer.Deserialize<OrganizerDataDto>(organizerRequest.Data);
+                    if (requestData != null)
+                    {
+                        var organizer = new Organizer
+                        {
+                            UserId = organizerRequest.UserId,
+                            CompanyName = requestData.CompanyName,
+                            Description = requestData.Description,
+                            WebSite = requestData.WebSite
+                        };
+                        await _organizerRepository.AddAsync(organizer, ct);
+                        await _organizerRepository.SaveChangesAsync(ct);
+                    }
+                }
+
                 await _unitOfWork.CommitAsync(ct);
                 _logger.LogInformation("Заявка организатора с ID {Id} успешно утверждена", request.Id);
 
@@ -86,5 +113,7 @@ namespace EventFlow.Application.Commands.OrganizerCommands
                 return Result.Failure("Ошибка при изменении роли по заявке", 400);
             }
         }
+
+        private record OrganizerDataDto(string? CompanyName, string? Description, string? WebSite);
     }
 }

@@ -12,18 +12,21 @@ namespace EventFlow.Application.Commands.OrganizerCommands
     public class CreateOrganizerCommandHandler : IRequestHandler<CreateOrganizerCommand, Result>
     {
         private readonly IOrganizerRepository _organizerRepository;
+        private readonly IOrganizerRequestRepository _organizerRequestRepository;
         private readonly ILogger<CreateOrganizerCommandHandler> _logger;
         private readonly IValidator<CreateOrganizerCommand> _validator;
         private readonly IUserRepository _userRepository;
         private readonly IMessageService _emailService;
 
-        public CreateOrganizerCommandHandler(IOrganizerRepository organizerRepository, 
-                                             ILogger<CreateOrganizerCommandHandler> logger, 
+        public CreateOrganizerCommandHandler(IOrganizerRepository organizerRepository,
+                                             IOrganizerRequestRepository organizerRequestRepository,
+                                             ILogger<CreateOrganizerCommandHandler> logger,
                                              IValidator<CreateOrganizerCommand> validator,
                                              IUserRepository userRepository,
                                              IMessageService emailService)
         {
             _organizerRepository = organizerRepository;
+            _organizerRequestRepository = organizerRequestRepository;
             _logger = logger;
             _validator = validator;
             _userRepository = userRepository;
@@ -52,44 +55,46 @@ namespace EventFlow.Application.Commands.OrganizerCommands
                 return Result.Failure("Пользователь не найден", 404);
             }
             
-            // Проверяем, что у пользователя нет уже заявки организатора
+            // Проверяем, что пользователь ещё не является организатором
             var existingOrganizer = await _organizerRepository.GetByUserIdAsync((Guid)userId, ct);
             if (existingOrganizer != null)
             {
-                if (existingOrganizer.IsVerified)
-                {
-                    _logger.LogWarning("Пользователь с ID {UserId} уже является организатором", userId);
-                    return Result.Failure("Вы уже являетесь организатором", 409);
-                }
-                else if(!existingOrganizer.IsVerified && !existingOrganizer.IsDelete)
-                {
-                    _logger.LogWarning("Пользователь с ID {UserId} уже подал заявку на регистрацию", userId);
-                    return Result.Failure("Вы уже подали заявку на регистрацию", 409);
-                }
+                _logger.LogWarning("Пользователь с ID {UserId} уже имеет профиль организатора", userId);
+                return Result.Failure("Вы уже являетесь организатором", 409);
             }
 
-            if (existingOrganizer is null)
+            // Проверяем, что у пользователя нет активной заявки
+            var existingRequest = await _organizerRequestRepository.GetActiveByUserIdAsync((Guid)userId, ct);
+            if (existingRequest != null)
             {
-                // Создаем новую заявку организатора
-                var organizer = new Organizer
-                {
-                    UserId = (Guid)userId!,
-                    CompanyName = request.CompanyName,
-                    Description = request.Description,
-                    WebSite = request.WebSite,
-                    IsVerified = false
-                };
-                await _organizerRepository.AddAsync(organizer, ct);
+                _logger.LogWarning("Пользователь с ID {UserId} уже подал заявку на регистрацию", userId);
+                return Result.Failure("Вы уже подали заявку на регистрацию", 409);
             }
-            else
+
+            // Формируем JSON-данные заявки для удобства администратора при рассмотрении
+            var requestData = new { CompanyName = request.CompanyName, Description = request.Description, WebSite = request.WebSite };
+            var dataJson = System.Text.Json.JsonSerializer.Serialize(requestData);
+
+            // Создаем новую заявку организатора
+            var organizerRequest = new OrganizerRequest
             {
-                existingOrganizer.CompanyName = request.CompanyName;
-                existingOrganizer.Description = request.Description;
-                existingOrganizer.WebSite = request.WebSite;
-                existingOrganizer.IsDelete = false;
-                await _organizerRepository.UpdateAsync(existingOrganizer, ct);
-            }
-            await _organizerRepository.SaveChangesAsync(ct);
+                UserId = (Guid)userId!,
+                Status = Domain.Enums.OrganizerRequestStatus.Pending,
+                Data = dataJson
+            };
+            await _organizerRequestRepository.AddAsync(organizerRequest, ct);
+
+            // Также создаём профиль Organizer (без верификации)
+            var organizer = new Organizer
+            {
+                UserId = (Guid)userId!,
+                CompanyName = request.CompanyName,
+                Description = request.Description,
+                WebSite = request.WebSite
+            };
+            await _organizerRepository.AddAsync(organizer, ct);
+
+            await _organizerRequestRepository.SaveChangesAsync(ct);
             _logger.LogInformation("Заявка организатора для пользователя {UserId} успешно создана", userId);
 
             // Получаем информацию о пользователе для отправки email

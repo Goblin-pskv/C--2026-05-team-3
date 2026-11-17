@@ -3,5 +3,5 @@ using MediatR;
 
 namespace EventFlow.Application.Commands.OrganizerCommands
 {
-    public record ApproveOrganizerCommand(Guid Id) : IRequest<Result>;
+    public record ApproveOrganizerCommand(Guid Id, Guid? AdminId) : IRequest<Result>;
 }

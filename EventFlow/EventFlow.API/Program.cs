@@ -120,6 +120,7 @@ builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 builder.Services.AddScoped<ITicketRepository, TicketRepository>();
 builder.Services.AddScoped(typeof(IRegistrationRepository), typeof(RegistrationRepository));
 builder.Services.AddScoped(typeof(IOrganizerRepository), typeof(OrganizerRepository));
+builder.Services.AddScoped(typeof(IOrganizerRequestRepository), typeof(OrganizerRequestRepository));
 builder.Services.AddScoped(typeof(IUnitOfWork), typeof(UnitOfWork));
 builder.Services.AddScoped<RegisterUserCommandHandler>();
 builder.Services.AddScoped<UpdateProfileCommandHandler>();

@@ -10,41 +10,55 @@ namespace EventFlow.Application.Queries.OrganizerQueries
     public class GetMyOrganizerQueryHandler : IRequestHandler<GetMyOrganizerQuery, Result<OrganizerDto>>
     {
         private readonly IOrganizerRepository _organizerRepository;
-        private readonly IUserRepository _userRepository;
+        private readonly IOrganizerRequestRepository _organizerRequestRepository;
         private readonly ILogger<GetMyOrganizerQueryHandler> _logger;
 
-        public GetMyOrganizerQueryHandler(IOrganizerRepository organizerRepository, IUserRepository userRepository, ILogger<GetMyOrganizerQueryHandler> logger)
+        public GetMyOrganizerQueryHandler(IOrganizerRepository organizerRepository, IOrganizerRequestRepository organizerRequestRepository, ILogger<GetMyOrganizerQueryHandler> logger)
         {
             _organizerRepository = organizerRepository;
-            _userRepository = userRepository;
+            _organizerRequestRepository = organizerRequestRepository;
             _logger = logger;
         }
 
         public async Task<Result<OrganizerDto>> Handle(GetMyOrganizerQuery request, CancellationToken ct)
         {
             _logger.LogInformation("Получение профиля организатора для текущего пользователя");
-            
+
             var userId = request.userId;
 
             try
             {
+                // Сначала проверяем, есть ли подтверждённый профиль
                 var organizer = await _organizerRepository.GetByUserIdAsync((Guid)userId, ct);
-                if (organizer == null)
+                if (organizer != null)
                 {
-                    _logger.LogWarning("Профиль организатора для пользователя {UserId} не найден", userId);
-                    return Result<OrganizerDto>.Failure("Профиль организатора не найден", 404);
+                    var dto = new OrganizerDto()
+                    {
+                        CompanyName = organizer.CompanyName,
+                        Description = organizer.Description,
+                        WebSite = organizer.WebSite,
+                        IsVerified = true,
+                        EventsCount = organizer.EventsCount
+                    };
+                    _logger.LogInformation("Профиль организатора для пользователя {UserId} успешно получен", userId);
+                    return Result<OrganizerDto>.Success(dto);
                 }
-                var organizerDto = new OrganizerDto()
-                {
-                    CompanyName = organizer.CompanyName,
-                    Description = organizer.Description,
-                    WebSite = organizer.WebSite,
-                    IsVerified = organizer.IsVerified,
-                    EventsCount = organizer.EventsCount
-                };
 
-                _logger.LogInformation("Профиль организатора для пользователя {UserId} успешно получен", userId);
-                return Result<OrganizerDto>.Success(organizerDto);
+                // Если профиля нет, проверяем активную заявку
+                var requestEntity = await _organizerRequestRepository.GetActiveByUserIdAsync((Guid)userId, ct);
+                if (requestEntity != null)
+                {
+                    var dto = new OrganizerDto()
+                    {
+                        IsVerified = false,
+                        EventsCount = 0
+                    };
+                    _logger.LogInformation("Для пользователя {UserId} найдена активная заявка на организатора", userId);
+                    return Result<OrganizerDto>.Success(dto);
+                }
+
+                _logger.LogWarning("Профиль организатора для пользователя {UserId} не найден", userId);
+                return Result<OrganizerDto>.Failure("Профиль организатора не найден", 404);
             }
             catch (Exception ex)
             {

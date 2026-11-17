@@ -1,40 +1,49 @@
 using EventFlow.Application.Common;
+using EventFlow.Application.DTOs;
 using EventFlow.Application.Interfaces;
-using EventFlow.Domain.Entities;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using System.Security.Claims;
 
 namespace EventFlow.Application.Queries.OrganizerQueries
 {
-    public class GetAllOrganizerQueryHandler : IRequestHandler<GetAllOrganizerQuery, Result<IEnumerable<Organizer>>>
+    public class GetAllOrganizerQueryHandler : IRequestHandler<GetAllOrganizerQuery, Result<IEnumerable<OrganizerRequestDto>>>
     {
-        private readonly IOrganizerRepository _organizerRepository;
-        private readonly IUserRepository _userRepository;
+        private readonly IOrganizerRequestRepository _organizerRequestRepository;
         private readonly ILogger<GetAllOrganizerQueryHandler> _logger;
 
-        public GetAllOrganizerQueryHandler(IOrganizerRepository organizerRepository, IUserRepository userRepository, ILogger<GetAllOrganizerQueryHandler> logger)
+        public GetAllOrganizerQueryHandler(IOrganizerRequestRepository organizerRequestRepository, ILogger<GetAllOrganizerQueryHandler> logger)
         {
-            _organizerRepository = organizerRepository;
-            _userRepository = userRepository;
+            _organizerRequestRepository = organizerRequestRepository;
             _logger = logger;
         }
 
-        public async Task<Result<IEnumerable<Organizer>>> Handle(GetAllOrganizerQuery request, CancellationToken ct)
+        public async Task<Result<IEnumerable<OrganizerRequestDto>>> Handle(GetAllOrganizerQuery request, CancellationToken ct)
         {
             _logger.LogInformation("Получение всех заявок организаторов");
-            
+
             try
             {
-                var organizers = await _organizerRepository.GetPendingAsync(request.offset, request.count, ct);
-                _logger.LogInformation("Заявки организаторов успешно получены. Количество: {Count}", organizers.Count());
-                
-                return Result<IEnumerable<Organizer>>.Success(organizers);
+                var requests = await _organizerRequestRepository.GetPendingAsync(request.offset, request.count, ct);
+                var dtoList = requests.Select(r => new OrganizerRequestDto
+                {
+                    Id = r.Id,
+                    UserId = r.UserId,
+                    UserName = $"{r.User.FirstName} {r.User.LastName}".Trim(),
+                    Status = r.Status,
+                    Data = r.Data,
+                    RejectionReason = r.RejectionReason,
+                    ReviewedAt = r.ReviewedAt,
+                    CreatedAt = r.CreatedAt
+                });
+
+                _logger.LogInformation("Заявки организаторов успешно получены.");
+
+                return Result<IEnumerable<OrganizerRequestDto>>.Success(dtoList);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Ошибка при получении всех заявок организаторов");
-                return Result<IEnumerable<Organizer>>.Failure("Ошибка при получении заявок организаторов", 500);
+                return Result<IEnumerable<OrganizerRequestDto>>.Failure("Ошибка при получении заявок организаторов", 500);
             }
         }
     }

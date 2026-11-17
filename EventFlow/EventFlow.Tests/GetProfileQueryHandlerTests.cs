@@ -15,14 +15,22 @@ namespace EventFlow.Tests
     public class GetProfileQueryHandlerTests
     {
         private readonly Mock<IUserRepository> _userRepositoryMock;
+        private readonly Mock<IOrganizerRepository> _organizerRepositoryMock;
+        private readonly Mock<IOrganizerRequestRepository> _organizerRequestRepositoryMock;
+        private readonly Mock<ILogger<GetProfileQueryHandler>> _loggerMock;
         private readonly GetProfileQueryHandler _handler;
 
         public GetProfileQueryHandlerTests()
         {
             _userRepositoryMock = new Mock<IUserRepository>();
-            
+            _organizerRepositoryMock = new Mock<IOrganizerRepository>();
+            _organizerRequestRepositoryMock = new Mock<IOrganizerRequestRepository>();
+            _loggerMock = new Mock<ILogger<GetProfileQueryHandler>>();
             _handler = new GetProfileQueryHandler(
-                _userRepositoryMock.Object);
+                _userRepositoryMock.Object,
+                _organizerRepositoryMock.Object,
+                _organizerRequestRepositoryMock.Object,
+                _loggerMock.Object);
         }
 
         [Fact]
@@ -62,6 +70,8 @@ namespace EventFlow.Tests
             
             _userRepositoryMock.Setup(r => r.GetByIdAsync(query.UserId))
                                .ReturnsAsync(user);
+            _userRepositoryMock.Setup(r => r.GetUserRoles(query.UserId))
+                               .ReturnsAsync(new List<string> { "User" });
 
             // Act
             var result = await _handler.Handle(query, CancellationToken.None);

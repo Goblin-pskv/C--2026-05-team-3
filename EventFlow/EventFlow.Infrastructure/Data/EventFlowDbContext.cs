@@ -34,6 +34,9 @@ namespace EventFlow.Infrastructure.Data
         /// <summary>Таблица профилей организаторов</summary>
         public DbSet<Organizer> Organizers => Set<Organizer>();
 
+        /// <summary>Таблица заявок на роль организатора</summary>
+        public DbSet<OrganizerRequest> OrganizerRequests => Set<OrganizerRequest>();
+
         /// <summary>Таблица мероприятий</summary>
         public DbSet<Event> Events => Set<Event>();
 

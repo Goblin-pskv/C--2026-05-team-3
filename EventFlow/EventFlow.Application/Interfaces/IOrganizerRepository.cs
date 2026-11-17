@@ -31,10 +31,5 @@ namespace EventFlow.Application.Interfaces
         /// </example>
         Task<Organizer?> GetByUserIdAsync(Guid userId, CancellationToken ct);
 
-        /// <summary>
-        /// Получить все неверифицированные профили организаторов (для администратора).
-        /// </summary>
-        /// <returns>Список неверифицированных профилей организаторов</returns>
-        Task<IEnumerable<Organizer>> GetPendingAsync(int offset, int count, CancellationToken ct);
     }
 }

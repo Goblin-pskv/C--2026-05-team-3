@@ -25,33 +25,20 @@ namespace EventFlow.Infrastructure.Repositories
         public async Task<Organizer?> GetByUserIdAsync(Guid userId, CancellationToken ct)
         {
             return await _dbSet
-                .Where(o => o.UserId == userId && o.IsVerified == false)
+                .Where(o => o.UserId == userId)
                 .Select(o => new Organizer
                 {
                     Id = o.Id,
                     UserId = o.UserId,
                     CompanyName = o.CompanyName,
                     Description = o.Description,
-                    IsVerified = o.IsVerified,
                     UpdatedAt = o.UpdatedAt,
                     CreatedAt = o.CreatedAt,
                     EventsCount = o.Events.Count(),
                     User = o.User,
-                    WebSite = o.WebSite,
-                    IsDelete = o.IsDelete,
-                    Reason = null
+                    WebSite = o.WebSite
                 })
                 .FirstOrDefaultAsync();
-        }
-
-        public async Task<IEnumerable<Organizer>> GetPendingAsync(int offset, int count, CancellationToken ct)
-        {
-            return await _dbSet
-                .Where(o => o.IsVerified == false && o.IsDelete == false)
-                .OrderBy(o => o.CreatedAt)
-                .Skip(offset)
-                .Take(count)
-                .ToListAsync(ct);
         }
     }
 }

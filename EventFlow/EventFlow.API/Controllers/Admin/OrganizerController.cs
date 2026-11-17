@@ -50,7 +50,10 @@ namespace EventFlow.API.Controllers.Admin
         [HttpPatch("{id}/approve")]
         public async Task<IActionResult> ApproveOrganizerCommand(Guid id)
         {
-            var command = new ApproveOrganizerCommand(id);
+            var adminId = GetUserId();
+            if (adminId is null)
+                return Unauthorized();
+            var command = new ApproveOrganizerCommand(id, adminId);
             var result = await _mediator.Send(command);
             return HandleResult(result);
         }
@@ -64,7 +67,10 @@ namespace EventFlow.API.Controllers.Admin
         [HttpDelete("{id}/reject")]
         public async Task<IActionResult> RejectOrganizerCommand(Guid id, [FromBody] string reason)
         {
-            var command = new RejectOrganizerCommand (id, reason);
+            var adminId = GetUserId();
+            if (adminId is null)
+                return Unauthorized();
+            var command = new RejectOrganizerCommand(id, reason, adminId);
             var result = await _mediator.Send(command);
             return HandleResult(result);
         }

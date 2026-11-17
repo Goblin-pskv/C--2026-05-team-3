@@ -31,15 +31,6 @@ namespace EventFlow.Domain.Entities
         public string? WebSite {  get; set; }
 
         /// <summary>
-        /// Флаг верификации организатора.
-        /// true = документы проверены администрацией
-        /// false = еще не проверен или отклонен
-        /// </summary>
-        public bool IsVerified { get; set; }
-
-        public bool IsDelete { get; set; } = false;
-        public string? Reason { get; set; }
-        /// <summary>
         /// Пользователь, которому принадлежит этот профиль.
         /// Навигационное свойство для EF Core.
         /// Связь: один Organizer принадлежит одному User (1:1)

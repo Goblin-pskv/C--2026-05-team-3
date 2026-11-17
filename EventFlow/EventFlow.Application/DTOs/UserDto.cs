@@ -32,5 +32,8 @@ namespace EventFlow.Application.DTOs
 
         /// <summary>Дата регистрации</summary>
         public DateTime CreatedAt { get; set; }
+
+        /// <summary>Профиль организатора (если пользователь является организатором)</summary>
+        public OrganizerDto? OrganizerProfile { get; set; }
     }
 }
