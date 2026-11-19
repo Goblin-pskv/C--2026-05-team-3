@@ -1,31 +1,45 @@
 using EventFlow.Application.Common;
 using EventFlow.Application.DTOs;
 using EventFlow.Application.Interfaces;
+using EventFlow.Domain.Enums;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using System.ComponentModel;
+using System.Reflection;
 
 namespace EventFlow.Application.Queries.EventQueries
 {
-    public class GetMyEventsQueryHandler : IRequestHandler<GetMyEventsQuery, Result<PaginatedResult<EventDto>>>
+    public class GetMyEventsQueryHandler : IRequestHandler<GetMyEventsQuery, Result<PageResponse<EventDto>>>
     {
         private readonly IEventRepository _eventRepository;
+        private readonly IOrganizerRepository _organizerRepository;
         private readonly ILogger<GetMyEventsQueryHandler> _logger;
 
-        public GetMyEventsQueryHandler(IEventRepository eventRepository, ILogger<GetMyEventsQueryHandler> logger)
+        public GetMyEventsQueryHandler(IEventRepository eventRepository,
+                                        IOrganizerRepository organizerRepository,
+                                        ILogger<GetMyEventsQueryHandler> logger)
         {
             _eventRepository = eventRepository;
+            _organizerRepository = organizerRepository;
             _logger = logger;
         }
 
-        public async Task<Result<PaginatedResult<EventDto>>> Handle(GetMyEventsQuery request, CancellationToken cancellationToken)
+        public async Task<Result<PageResponse<EventDto>>> Handle(GetMyEventsQuery request, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Получение списка мероприятий организатора {OrganizerId} со страницей {Page} размером {PageSize}",
                 request.OrganizerId, request.Page, request.PageSize);
 
             try
             {
+                var organizer = await _organizerRepository.GetByUserIdAsync(request.OrganizerId, cancellationToken);
+                if (organizer == null)
+                {
+                    _logger.LogWarning("Организатор не найден для UserId: {OrganizerId}", request.OrganizerId);
+                    return Result<PageResponse<EventDto>>.Failure("Пользователь не является организатором", 404);
+                }
+
                 var (events, totalCount) = await _eventRepository.GetEventsByOrganizerWithPaginationAsync(
-                    request.OrganizerId, request.Page, request.PageSize, cancellationToken);
+                    organizer.Id, request.Page, request.PageSize, cancellationToken);
 
                 var dtos = events.Select(e => new EventDto
                 {
@@ -50,14 +64,35 @@ namespace EventFlow.Application.Queries.EventQueries
                     TotalCount = totalCount
                 };
 
+                var enumTypes = Enum.GetValues<EventType>()
+                    .ToDictionary(
+                        e => e.ToString(),
+                        e => GetDescription(e));
+
+                var enumStatuses = Enum.GetValues<EventStatus>()
+                    .ToDictionary(
+                        e => e.ToString(),
+                        e => GetDescription(e));
+
                 _logger.LogInformation("Успешно получено {Count} мероприятий из {TotalCount}", dtos.Count, totalCount);
-                return Result<PaginatedResult<EventDto>>.Success(result);
+                return Result<PageResponse<EventDto>>.Success(new PageResponse<EventDto>
+                {
+                    Data = result,
+                    Dictionaries = new List<Dictionary<string, string>> { enumTypes, enumStatuses }
+                });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Ошибка при получении списка мероприятий организатора {OrganizerId}", request.OrganizerId);
-                return Result<PaginatedResult<EventDto>>.Failure("Произошла ошибка при получении списка мероприятий", 500);
+                return Result<PageResponse<EventDto>>.Failure("Произошла ошибка при получении списка мероприятий", 500);
             }
+        }
+
+        private static string GetDescription(Enum value)
+        {
+            var member = value.GetType().GetMember(value.ToString()).FirstOrDefault();
+            var attribute = member?.GetCustomAttribute<DescriptionAttribute>();
+            return attribute?.Description ?? value.ToString();
         }
     }
 }

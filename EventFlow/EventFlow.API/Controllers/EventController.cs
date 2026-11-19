@@ -25,7 +25,11 @@ namespace EventFlow.API.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateEventCommand([FromBody] CreateEventCommand command)
         {
-            Result? result = await _mediator.Send(command);
+            Guid? organizerId = GetUserId();
+            if (organizerId is null)
+                return Unauthorized();
+            var commandWithOrganizer = command with { OrganizerId = (Guid)organizerId };
+            Result? result = await _mediator.Send(commandWithOrganizer);
             return HandleResult(result);
         }
         /// <summary>

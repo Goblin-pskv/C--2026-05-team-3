@@ -18,6 +18,6 @@ namespace EventFlow.Application.Commands.EventCommands
         decimal Price,
         int MaxParticipants,
         Guid OrganizerId,
-        bool IsPublished
+        EventStatus Status
         ) : IRequest<Result>;
 }

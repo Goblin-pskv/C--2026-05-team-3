@@ -14,6 +14,7 @@ namespace EventFlow.Tests
         private readonly Mock<IEventRepository> _eventRepositoryMock;
         private readonly Mock<IValidator<CreateEventCommand>> _validatorMock;
         private readonly Mock<ILogger<CreateEventCommandHandle>> _loggerMock;
+        private readonly Mock<IOrganizerRepository> _organizerRepositoryMock;
         private readonly CreateEventCommandHandle _handler;
 
         public CreateEventCommandHandlerTests()
@@ -21,16 +22,20 @@ namespace EventFlow.Tests
             _eventRepositoryMock = new Mock<IEventRepository>();
             _validatorMock = new Mock<IValidator<CreateEventCommand>>();
             _loggerMock = new Mock<ILogger<CreateEventCommandHandle>>();
-            
+            _organizerRepositoryMock = new Mock<IOrganizerRepository>();
+
             _handler = new CreateEventCommandHandle(
                 _eventRepositoryMock.Object,
                 _validatorMock.Object,
+                _organizerRepositoryMock.Object,
                 _loggerMock.Object);
         }
 
         [Fact]
         public async Task Handle_WhenAllConditionsAreMet_ReturnsSuccessResult()
         {
+            var userId = Guid.NewGuid();
+            var organizerId = Guid.NewGuid();
             var command = new CreateEventCommand(
                 "Test Event",
                 "Test Description",
@@ -41,17 +46,19 @@ namespace EventFlow.Tests
                 "Test Address",
                 1000m,
                 100,
-                Guid.NewGuid(),
-                false
+                userId,
+                Domain.Enums.EventStatus.Draft
                 );
             var validationResult = new ValidationResult();
             _validatorMock.Setup(v => v.ValidateAsync(command, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(validationResult);
+            _organizerRepositoryMock.Setup(r => r.GetByUserIdAsync(userId, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new Organizer { Id = organizerId });
             var result = await _handler.Handle(command, It.IsAny<CancellationToken>());
 
             Assert.True(result.IsSuccess);
             Assert.Equal(200, result.StatusCode);
-            _eventRepositoryMock.Verify(r => r.AddAsync(It.IsAny<Event>(), It.IsAny<CancellationToken>()), Times.Once);
+            _eventRepositoryMock.Verify(r => r.AddAsync(It.Is<Event>(e => e.OrganizerId == organizerId), It.IsAny<CancellationToken>()), Times.Once);
             _eventRepositoryMock.Verify(r => r.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
         }
         [Fact]
@@ -68,7 +75,7 @@ namespace EventFlow.Tests
                 1000m,
                 100,
                 Guid.NewGuid(),
-                false
+                Domain.Enums.EventStatus.Draft
             );
 
             var validationResult = new ValidationResult();
@@ -87,6 +94,8 @@ namespace EventFlow.Tests
         [Fact]
         public async Task Handle_WhenSaveAsyncFails_ReturnsFailureResult()
         {
+            var userId = Guid.NewGuid();
+            var organizerId = Guid.NewGuid();
             var command = new CreateEventCommand(
                 "Test Event",
                 "Test Description",
@@ -97,14 +106,17 @@ namespace EventFlow.Tests
                 "Test Address",
                 1000m,
                 100,
-                Guid.NewGuid(),
-                false
+                userId,
+                Domain.Enums.EventStatus.Draft
             );
 
             var validationResult = new ValidationResult();
 
             _validatorMock.Setup(v => v.ValidateAsync(command, It.IsAny<CancellationToken>()))
                          .ReturnsAsync(validationResult);
+
+            _organizerRepositoryMock.Setup(r => r.GetByUserIdAsync(userId, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new Organizer { Id = organizerId });
 
             _eventRepositoryMock.Setup(r => r.AddAsync(It.IsAny<Event>(), It.IsAny<CancellationToken>()))
                                .ThrowsAsync(new DbUpdateException("Database error"));
@@ -115,6 +127,37 @@ namespace EventFlow.Tests
             Assert.Equal(500, result.StatusCode);
             _eventRepositoryMock.Verify(r => r.AddAsync(It.IsAny<Event>(), It.IsAny<CancellationToken>()), Times.Once);
             _eventRepositoryMock.Verify(r => r.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task Handle_WhenOrganizerNotFound_ReturnsFailureResult()
+        {
+            var userId = Guid.NewGuid();
+            var command = new CreateEventCommand(
+                "Test Event",
+                "Test Description",
+                Domain.Enums.EventType.Conference,
+                DateTime.UtcNow.AddDays(1),
+                DateTime.UtcNow.AddDays(2),
+                "Moscow",
+                "Test Address",
+                1000m,
+                100,
+                userId,
+                Domain.Enums.EventStatus.Draft
+            );
+
+            var validationResult = new ValidationResult();
+            _validatorMock.Setup(v => v.ValidateAsync(command, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(validationResult);
+            _organizerRepositoryMock.Setup(r => r.GetByUserIdAsync(userId, It.IsAny<CancellationToken>()))
+                .ReturnsAsync((Organizer?)null);
+
+            var result = await _handler.Handle(command, It.IsAny<CancellationToken>());
+
+            Assert.False(result.IsSuccess);
+            Assert.Equal(404, result.StatusCode);
+            _eventRepositoryMock.Verify(r => r.AddAsync(It.IsAny<Event>(), It.IsAny<CancellationToken>()), Times.Never);
         }
     }
 }

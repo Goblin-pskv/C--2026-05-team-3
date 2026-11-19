@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
 
 namespace EventFlow.Domain.Enums
@@ -13,16 +13,37 @@ namespace EventFlow.Domain.Enums
     /// </summary>
     public enum EventType
     {
-        Conference = 0, // конференция
-        Seminar = 1,  // семинар
-        Workshop = 2, // мастер-класс
-        Sports = 3, // спортивное мероприятие
-        Concert = 4, // концерт, музыкальное
-        Exhibition = 5, // выставка
-        Meetup = 6, // встреча, неформальное мероприятие
-        Birthday = 7, // день рождения
-        Funeral = 8, // похороны
-        Wedding = 9, // свадьба
-        Other = 99 // другое
+        [Description("Конференция")]
+        Conference = 0,
+
+        [Description("Семинар")]
+        Seminar = 1,
+
+        [Description("Мастер-класс")]
+        Workshop = 2,
+
+        [Description("Спортивное мероприятие")]
+        Sports = 3,
+
+        [Description("Концерт")]
+        Concert = 4,
+
+        [Description("Выставка")]
+        Exhibition = 5,
+
+        [Description("Встреча")]
+        Meetup = 6,
+
+        [Description("День рождения")]
+        Birthday = 7,
+
+        [Description("Похороны")]
+        Funeral = 8,
+
+        [Description("Свадьба")]
+        Wedding = 9,
+
+        [Description("Другое")]
+        Other = 99
     }
 }

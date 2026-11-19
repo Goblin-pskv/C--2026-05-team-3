@@ -2,6 +2,7 @@
 using EventFlow.Application.Common;
 using EventFlow.Application.Interfaces;
 using EventFlow.Domain.Entities;
+using EventFlow.Domain.Enums;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -17,15 +18,18 @@ namespace EventFlow.Application.Commands.EventCommands
 
         private readonly IValidator<CreateEventCommand> _validator;
         private readonly IEventRepository _eventRepository;
+        private readonly IOrganizerRepository _organizerRepository;
         private ILogger<CreateEventCommandHandle> _logger;
 
 
         public CreateEventCommandHandle(IEventRepository eventRepository,
                                            IValidator<CreateEventCommand> validator,
+                                           IOrganizerRepository organizerRepository,
                                            ILogger<CreateEventCommandHandle> logger)
         {
             _eventRepository = eventRepository;
             _validator = validator;
+            _organizerRepository = organizerRepository;
             _logger = logger;
         }
 
@@ -45,19 +49,27 @@ namespace EventFlow.Application.Commands.EventCommands
                 return Result.Failure(errors, 422);
             }
 
+            var organizer = await _organizerRepository.GetByUserIdAsync(request.OrganizerId, cancellationToken);
+            if (organizer == null)
+            {
+                _logger.LogWarning("Организатор не найден для UserId: {OrganizerId}", request.OrganizerId);
+                return Result.Failure("Пользователь не является организатором", 404);
+            }
+
             var new_event = new Event
-            {   
+            {
                 Title = request.Title,
                 Description = request.Description,
                 Type = request.Type,
-                Start = request.Start,
-                End = request.End,
+                Start = DateTime.SpecifyKind(request.Start,DateTimeKind.Utc),
+                End = DateTime.SpecifyKind(request.End,DateTimeKind.Utc),
                 City = request.City,
                 Address = request.Address,
                 Price = request.Price,
                 MaxParticipants = request.MaxParticipants,
-                OrganizerId = request.OrganizerId
-
+                OrganizerId = organizer.Id,
+                Status = request.Status,
+                IsPublished = request.Status == EventStatus.Published
             };
 
             try

@@ -23,6 +23,9 @@ namespace EventFlow.Application.Common.Validators
             RuleFor(x => x.Type)
                 .IsInEnum().WithMessage("Некорректный тип мероприятия");
 
+            RuleFor(x => x.Status)
+                .IsInEnum().WithMessage("Некорректный статус мероприятия");
+
             RuleFor(x => x.Start)
                 .NotEmpty().WithMessage("Дата начала обязательна")
                 .GreaterThan(DateTime.UtcNow).WithMessage("Дата начала должна быть в будущем");
