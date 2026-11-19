@@ -21,5 +21,12 @@ namespace EventFlow.Application.Interfaces
         /// <param name="ct">Токен отмены</param>
         /// <returns>Коллекция заявок Pending</returns>
         Task<IEnumerable<OrganizerRequest>> GetPendingAsync(int offset, int count, CancellationToken ct);
+
+        /// <summary>
+        /// Получить общее количество заявок со статусом Pending.
+        /// </summary>
+        /// <param name="ct">Токен отмены</param>
+        /// <returns>Общее количество заявок Pending</returns>
+        Task<int> GetPendingCountAsync(CancellationToken ct);
     }
 }

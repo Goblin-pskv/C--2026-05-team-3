@@ -27,5 +27,11 @@ namespace EventFlow.Infrastructure.Repositories
                 .Take(count)
                 .ToListAsync(ct);
         }
+
+        public async Task<int> GetPendingCountAsync(CancellationToken ct)
+        {
+            return await _dbSet
+                .CountAsync(o => o.Status == Domain.Enums.OrganizerRequestStatus.Pending, ct);
+        }
     }
 }
