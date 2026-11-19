@@ -70,5 +70,17 @@ namespace EventFlow.Infrastructure.Repositories
                 .Where(e => e.OrganizerId == organizerId)
                 .ToListAsync(ct);
         }
+
+        public async Task<(List<Event> Events, int TotalCount)> GetEventsByOrganizerWithPaginationAsync(Guid organizerId, int page, int pageSize, CancellationToken ct)
+        {
+            var query = _dbSet.Where(e => e.OrganizerId == organizerId);
+            var totalCount = await query.CountAsync(ct);
+            var events = await query
+                .OrderBy(e => e.Start)
+                .Skip(page * pageSize)
+                .Take(pageSize)
+                .ToListAsync(ct);
+            return (events, totalCount);
+        }
     }
 }

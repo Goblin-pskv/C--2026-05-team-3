@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace EventFlow.Application.Queries.OrganizerQueries
 {
-    public class GetAllOrganizerQueryHandler : IRequestHandler<GetAllOrganizerQuery, Result<PaginatedOrganizerRequestsResult>>
+    public class GetAllOrganizerQueryHandler : IRequestHandler<GetAllOrganizerQuery, Result<PaginatedResult<OrganizerRequestDto>>>
     {
         private readonly IOrganizerRequestRepository _organizerRequestRepository;
         private readonly ILogger<GetAllOrganizerQueryHandler> _logger;
@@ -17,7 +17,7 @@ namespace EventFlow.Application.Queries.OrganizerQueries
             _logger = logger;
         }
 
-        public async Task<Result<PaginatedOrganizerRequestsResult>> Handle(GetAllOrganizerQuery request, CancellationToken ct)
+        public async Task<Result<PaginatedResult<OrganizerRequestDto>>> Handle(GetAllOrganizerQuery request, CancellationToken ct)
         {
             _logger.LogInformation("Получение всех заявок организаторов");
 
@@ -38,7 +38,7 @@ namespace EventFlow.Application.Queries.OrganizerQueries
                     CreatedAt = r.CreatedAt
                 });
 
-                var result = new PaginatedOrganizerRequestsResult
+                var result = new PaginatedResult<OrganizerRequestDto>
                 {
                     Items = dtoList,
                     TotalCount = totalCount
@@ -46,12 +46,12 @@ namespace EventFlow.Application.Queries.OrganizerQueries
 
                 _logger.LogInformation("Заявки организаторов успешно получены.");
 
-                return Result<PaginatedOrganizerRequestsResult>.Success(result);
+                return Result<PaginatedResult<OrganizerRequestDto>>.Success(result);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Ошибка при получении всех заявок организаторов");
-                return Result<PaginatedOrganizerRequestsResult>.Failure("Ошибка при получении заявок организаторов", 500);
+                return Result<PaginatedResult<OrganizerRequestDto>>.Failure("Ошибка при получении заявок организаторов", 500);
             }
         }
     }

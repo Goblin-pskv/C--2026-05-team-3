@@ -70,5 +70,22 @@ namespace EventFlow.API.Controllers
             Result? result = await _mediator.Send(commandWithGuid);
             return HandleResult(result);
         }
+        /// <summary>
+        /// Получение списка мероприятий организатора с пагинацией
+        /// </summary>
+        /// <param name="page">Номер страницы (по умолчанию 0)</param>
+        /// <param name="pageSize">Размер страницы (по умолчанию 10)</param>
+        [HttpGet("my")]
+        public async Task<IActionResult> GetMyEventsQuery(
+            [FromQuery] int page = 0,
+            [FromQuery] int pageSize = 10)
+        {
+            Guid? organizerId = GetUserId();
+            if (organizerId is null)
+                return Unauthorized();
+            var query = new GetMyEventsQuery((Guid)organizerId, page, pageSize);
+            var result = await _mediator.Send(query);
+            return HandleResult(result);
+        }
     }
 }

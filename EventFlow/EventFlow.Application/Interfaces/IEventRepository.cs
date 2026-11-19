@@ -27,6 +27,7 @@ namespace EventFlow.Application.Interfaces
     {
         Task<List<Event>> GetPublishedEventsAsync(CancellationToken ct);
         Task<List<Event>> GetByOrganizerIdAsync(Guid organizerId, CancellationToken ct);
+        Task<(List<Event> Events, int TotalCount)> GetEventsByOrganizerWithPaginationAsync(Guid organizerId, int page, int pageSize, CancellationToken ct);
         Task<Event?> GetEventWithRegistrationsAsync(Guid eventId, CancellationToken ct);
         Task<List<Event>> GetEventsWithDetailsAsync(
             int page, int pageSize, DateTime dateStart, DateTime dateEnd, CancellationToken ct);
