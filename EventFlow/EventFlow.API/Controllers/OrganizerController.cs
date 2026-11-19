@@ -18,17 +18,17 @@ namespace EventFlow.API.Controllers
         }
 
         /// <summary>
-        /// Подать заявку на организатора
+        /// Подать заявку на роль организатора (только заявка, без создания профиля)
         /// </summary>
         /// <param name="command">Данные для подачи заявки</param>
         /// <returns>Результат операции</returns>
-        [HttpPost]
-        public async Task<IActionResult> CreateOrganizerCommand([FromBody] CreateOrganizerCommand command)
+        [HttpPost("request")]
+        public async Task<IActionResult> CreateOrganizerRequestCommand([FromBody] CreateOrganizerRequestCommand command)
         {
             Guid? userId = GetUserId();
             if (userId is null)
                 return Unauthorized();
-            var commandWith = command with { userId = (Guid)userId};
+            var commandWith = command with { userId = (Guid)userId };
             var result = await _mediator.Send(commandWith);
             return HandleResult(result);
         }

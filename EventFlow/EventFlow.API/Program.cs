@@ -135,7 +135,6 @@ builder.Services.AddScoped<GetEventRegistrationsQueryHandle>();
 builder.Services.AddScoped<GetUserRegistrationsQueryHandle>();
 builder.Services.AddScoped<RefreshUserCommandHandler>();
 builder.Services.AddScoped<ApproveOrganizerCommandHandler>();
-builder.Services.AddScoped<CreateOrganizerCommandHandler>();
 builder.Services.AddScoped<RejectOrganizerCommandHandler>();
 builder.Services.AddScoped<GetAllOrganizerQueryHandler>();
 builder.Services.AddScoped<GetMyOrganizerQueryHandler>();
