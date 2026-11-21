@@ -25,7 +25,7 @@ namespace EventFlow.Application.Interfaces
     /// </summary>
     public interface IEventRepository : IRepository<Event>
     {
-        Task<List<Event>> GetPublishedEventsAsync(CancellationToken ct);
+        Task<(List<Event> Events, int TotalCount)> GetPublishedEventsAsync(int page, int pageSize, CancellationToken ct);
         Task<List<Event>> GetByOrganizerIdAsync(Guid organizerId, CancellationToken ct);
         Task<(List<Event> Events, int TotalCount)> GetEventsByOrganizerWithPaginationAsync(Guid organizerId, int page, int pageSize, CancellationToken ct);
         Task<Event?> GetEventWithRegistrationsAsync(Guid eventId, CancellationToken ct);

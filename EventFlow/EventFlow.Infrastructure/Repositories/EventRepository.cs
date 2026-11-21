@@ -57,11 +57,16 @@ namespace EventFlow.Infrastructure.Repositories
                 .ToListAsync(ct);
         }
 
-        public async Task<List<Event>> GetPublishedEventsAsync(CancellationToken ct)
+        public async Task<(List<Event> Events, int TotalCount)> GetPublishedEventsAsync(int page, int pageSize, CancellationToken ct)
         {
-            return await _dbSet
-                .Where(e => e.IsPublished)
+            var query = _dbSet.Where(e => e.IsPublished);
+            var totalCount = await query.CountAsync(ct);
+            var events = await query
+                .OrderBy(e => e.Start)
+                .Skip(page * pageSize)
+                .Take(pageSize)
                 .ToListAsync(ct);
+            return (events, totalCount);
         }
 
         public async Task<List<Event>> GetByOrganizerIdAsync(Guid organizerId, CancellationToken ct)
