@@ -427,3 +427,4 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+/EventFlow/EventFlow.API/wwwroot/images/events
