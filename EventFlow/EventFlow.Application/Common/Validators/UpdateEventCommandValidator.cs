@@ -39,8 +39,11 @@ namespace EventFlow.Application.Commands.EventCommands
             RuleFor(x => x.MaxParticipants)
                 .GreaterThan(0).WithMessage("Количество участников должно быть больше 0");
 
-            RuleFor(x => x.OrganizerId)
-                .NotEmpty().WithMessage("Id организатора обязателен");
+            RuleFor(x => x.UserId)
+                .NotEmpty().WithMessage("Id пользователя обязателен");
+
+            RuleFor(x => x.Status)
+                .IsInEnum().WithMessage("Некорректный статус мероприятия");
         }
     }
 }

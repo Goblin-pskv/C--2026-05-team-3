@@ -17,7 +17,7 @@ namespace EventFlow.Application.Commands.EventCommands
         string Address,
         decimal Price,
         int MaxParticipants,
-        Guid OrganizerId,
+        Guid UserId,
         EventStatus Status
         ) : IRequest<Result>;
 }

@@ -25,11 +25,11 @@ namespace EventFlow.API.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateEventCommand([FromBody] CreateEventCommand command)
         {
-            Guid? organizerId = GetUserId();
-            if (organizerId is null)
+            Guid? userId = GetUserId();
+            if (userId is null)
                 return Unauthorized();
-            var commandWithOrganizer = command with { OrganizerId = (Guid)organizerId };
-            Result? result = await _mediator.Send(commandWithOrganizer);
+            var commandWithOwner = command with { UserId = (Guid)userId };
+            Result? result = await _mediator.Send(commandWithOwner);
             return HandleResult(result);
         }
         /// <summary>
@@ -64,14 +64,16 @@ namespace EventFlow.API.Controllers
         /// <summary>
         /// Обновление данных мероприятия
         /// </summary>
-        /// <param name="eventId">ID мероприятия</param>
         /// <param name="command"></param>
         /// <returns></returns>
-        [HttpPut("{eventId}")]
-        public async Task<IActionResult> UpdateEventCommand (Guid eventId, [FromBody] UpdateEventCommand command)
+        [HttpPut]
+        public async Task<IActionResult> UpdateEventCommand([FromBody] UpdateEventCommand command)
         {
-            var commandWithGuid = command with { EventId = eventId};
-            Result? result = await _mediator.Send(commandWithGuid);
+            Guid? userId = GetUserId();
+            if (userId is null)
+                return Unauthorized();
+            var commandWithOwner = command with { UserId = (Guid)userId };
+            Result? result = await _mediator.Send(commandWithOwner);
             return HandleResult(result);
         }
         /// <summary>

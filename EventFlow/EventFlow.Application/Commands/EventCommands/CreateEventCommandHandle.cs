@@ -49,10 +49,10 @@ namespace EventFlow.Application.Commands.EventCommands
                 return Result.Failure(errors, 422);
             }
 
-            var organizer = await _organizerRepository.GetByUserIdAsync(request.OrganizerId, cancellationToken);
+            var organizer = await _organizerRepository.GetByUserIdAsync(request.UserId, cancellationToken);
             if (organizer == null)
             {
-                _logger.LogWarning("Организатор не найден для UserId: {OrganizerId}", request.OrganizerId);
+                _logger.LogWarning("Организатор не найден для UserId: {UserId}", request.UserId);
                 return Result.Failure("Пользователь не является организатором", 404);
             }
 

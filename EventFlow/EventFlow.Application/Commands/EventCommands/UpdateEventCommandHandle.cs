@@ -2,6 +2,7 @@
 using EventFlow.API.Controllers;
 using EventFlow.Application.Common;
 using EventFlow.Application.Interfaces;
+using EventFlow.Domain.Enums;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -14,15 +15,18 @@ namespace EventFlow.Application.Commands.EventCommands
 
         private readonly IValidator<UpdateEventCommand> _validator;
         private readonly IEventRepository _eventRepository;
+        private readonly IOrganizerRepository _organizerRepository;
         private ILogger<UpdateEventCommandHandle> _logger;
 
 
         public UpdateEventCommandHandle(IEventRepository eventRepository,
                                            IValidator<UpdateEventCommand> validator,
+                                           IOrganizerRepository organizerRepository,
                                            ILogger<UpdateEventCommandHandle> logger)
         {
             _eventRepository = eventRepository;
             _validator = validator;
+            _organizerRepository = organizerRepository;
             _logger = logger;
         }
 
@@ -47,6 +51,19 @@ namespace EventFlow.Application.Commands.EventCommands
                 return Result.Failure($"Мероприятие с Id {request.EventId} не найдено", 404);
             }
 
+            //Проверка прав: мероприятие должно принадлежать текущему организатору
+            var organizer = await _organizerRepository.GetByUserIdAsync(request.UserId, cancellationToken);
+            if (organizer == null)
+            {
+                _logger.LogWarning("Организатор не найден для UserId: {UserId}", request.UserId);
+                return Result.Failure("Пользователь не является организатором", 404);
+            }
+            if (existingEvent.OrganizerId != organizer.Id)
+            {
+                _logger.LogWarning("Мероприятие {Id} не принадлежит организатору {OrganizerId}", request.EventId, organizer.Id);
+                return Result.Failure("У вас нет прав для редактирования этого мероприятия", 403);
+            }
+
             //Обновление полей
             existingEvent.Title = request.Title;
             existingEvent.Description = request.Description;
@@ -57,8 +74,8 @@ namespace EventFlow.Application.Commands.EventCommands
             existingEvent.Address = request.Address;
             existingEvent.Price = request.Price;
             existingEvent.MaxParticipants = request.MaxParticipants;
-            existingEvent.OrganizerId = request.OrganizerId;
-            existingEvent.IsPublished = request.IsPublished;
+            existingEvent.Status = request.Status;
+            existingEvent.IsPublished = request.Status == EventStatus.Published;
             existingEvent.UpdatedAt = DateTime.UtcNow;
 
             try

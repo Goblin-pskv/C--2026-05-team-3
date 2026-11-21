@@ -15,7 +15,7 @@ namespace EventFlow.API.Controllers
         string Address,
         decimal Price,
         int MaxParticipants,
-        Guid OrganizerId,
-        bool IsPublished) : IRequest<Result>;
+        Guid UserId,
+        EventStatus Status) : IRequest<Result>;
       
 }

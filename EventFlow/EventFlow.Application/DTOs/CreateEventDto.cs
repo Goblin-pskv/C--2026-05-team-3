@@ -9,7 +9,7 @@ namespace EventFlow.Application.DTOs
     /// Используется в POST /api/events.
     /// 
     /// Содержит только поля, которые может заполнить организатор.
-    /// Поля Id, OrganizerId, Status, CreatedAt устанавливаются автоматически.
+    /// Поля Id, UserId, Status, CreatedAt устанавливаются автоматически.
     /// 
     /// Валидация выполняется через FluentValidation (CreateEventValidator).
     /// </summary>
