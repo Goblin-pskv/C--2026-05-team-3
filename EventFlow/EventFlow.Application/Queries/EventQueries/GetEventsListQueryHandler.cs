@@ -1,17 +1,15 @@
 using EventFlow.Application.Common;
 using EventFlow.Application.DTOs;
 using EventFlow.Application.Interfaces;
+using EventFlow.Domain.Enums;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel;
+using System.Reflection;
 
 namespace EventFlow.Application.Queries.EventQueries
 {
-    public class GetEventsListQueryHandler : IRequestHandler<GetEventsListQuery, Result<PaginatedResult<EventDto>>>
+    public class GetEventsListQueryHandler : IRequestHandler<GetEventsListQuery, Result<PageResponse<EventDto>>>
     {
         private readonly IEventRepository _eventRepository;
         private readonly ILogger<GetEventsListQueryHandler> _logger;
@@ -24,7 +22,7 @@ namespace EventFlow.Application.Queries.EventQueries
             _logger = logger;
         }
 
-        public async Task<Result<PaginatedResult<EventDto>>> Handle(GetEventsListQuery request, CancellationToken cancellationToken)
+        public async Task<Result<PageResponse<EventDto>>> Handle(GetEventsListQuery request, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Получение списка опубликованных мероприятий со страницей {Page} размером {PageSize}",
                 request.Page, request.PageSize);
@@ -49,21 +47,44 @@ namespace EventFlow.Application.Queries.EventQueries
                     Price = e.Price,
                     MaxParticipants = e.MaxParticipants,
                     IsPublished = e.IsPublished,
+                    Status = e.Status.ToString(),
+                    ImageUrl = e.ImageUrl,
                     CreatedAt = e.CreatedAt
                 }).ToList();
 
+                var enumTypes = Enum.GetValues<EventType>()
+                    .ToDictionary(
+                        e => e.ToString(),
+                        e => GetDescription(e));
+
+                var enumStatuses = Enum.GetValues<EventStatus>()
+                    .ToDictionary(
+                        e => e.ToString(),
+                        e => GetDescription(e));
+
                 _logger.LogInformation("Успешно получено {Count} мероприятий из {TotalCount}", dtos.Count, totalCount);
-                return Result<PaginatedResult<EventDto>>.Success(new PaginatedResult<EventDto>
+                return Result<PageResponse<EventDto>>.Success(new PageResponse<EventDto>
                 {
-                    Items = dtos,
-                    TotalCount = totalCount
+                    Data = new PaginatedResult<EventDto>
+                    {
+                        Items = dtos,
+                        TotalCount = totalCount
+                    },
+                    Dictionaries = new List<Dictionary<string, string>> { enumTypes, enumStatuses }
                 });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Ошибка при получении списка мероприятий");
-                return Result<PaginatedResult<EventDto>>.Failure("Произошла ошибка при получении списка мероприятий", 500);
+                return Result<PageResponse<EventDto>>.Failure("Произошла ошибка при получении списка мероприятий", 500);
             }
+        }
+
+        private static string GetDescription(Enum value)
+        {
+            var member = value.GetType().GetMember(value.ToString()).FirstOrDefault();
+            var attribute = member?.GetCustomAttribute<DescriptionAttribute>();
+            return attribute?.Description ?? value.ToString();
         }
     }
 }

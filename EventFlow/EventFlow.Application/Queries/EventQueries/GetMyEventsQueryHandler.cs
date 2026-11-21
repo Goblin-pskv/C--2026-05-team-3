@@ -54,6 +54,7 @@ namespace EventFlow.Application.Queries.EventQueries
                     Price = e.Price,
                     MaxParticipants = e.MaxParticipants,
                     IsPublished = e.IsPublished,
+                    ImageUrl = e.ImageUrl,
                     Status = e.Status.ToString(),
                     CreatedAt = e.CreatedAt
                 }).ToList();

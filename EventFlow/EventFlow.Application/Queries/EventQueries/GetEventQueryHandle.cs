@@ -54,6 +54,7 @@ namespace EventFlow.Application.Queries.EventQueries
                 MaxParticipants = eventEntity.MaxParticipants,
                 //OrganizerId = eventEntity.OrganizerId,
                 IsPublished = eventEntity.IsPublished,
+                ImageUrl = eventEntity.ImageUrl,
                 CreatedAt = eventEntity.CreatedAt
             };
 

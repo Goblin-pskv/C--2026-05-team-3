@@ -18,6 +18,7 @@ namespace EventFlow.Application.Commands.EventCommands
         decimal Price,
         int MaxParticipants,
         Guid UserId,
-        EventStatus Status
+        EventStatus Status,
+        string? ImageUrl = null
         ) : IRequest<Result>;
 }

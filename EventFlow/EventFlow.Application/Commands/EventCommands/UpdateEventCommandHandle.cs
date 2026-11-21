@@ -75,7 +75,7 @@ namespace EventFlow.Application.Commands.EventCommands
             existingEvent.Price = request.Price;
             existingEvent.MaxParticipants = request.MaxParticipants;
             existingEvent.Status = request.Status;
-            existingEvent.IsPublished = request.Status == EventStatus.Published;
+            existingEvent.IsPublished = request.Status is EventStatus.Published or EventStatus.InProgress or EventStatus.Completed;
             existingEvent.UpdatedAt = DateTime.UtcNow;
 
             try

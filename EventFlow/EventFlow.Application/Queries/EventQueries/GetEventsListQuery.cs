@@ -12,5 +12,5 @@ namespace EventFlow.Application.Queries.EventQueries
         int PageSize = 10,
         DateTime? DateStart = null,
         DateTime? DateEnd = null
-        ) : IRequest<Result<PaginatedResult<EventDto>>>;
+        ) : IRequest<Result<PageResponse<EventDto>>>;
 }

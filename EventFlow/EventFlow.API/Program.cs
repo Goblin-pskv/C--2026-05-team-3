@@ -127,6 +127,7 @@ builder.Services.AddScoped<UpdateProfileCommandHandler>();
 builder.Services.AddScoped<GetProfileQueryHandler>();
 builder.Services.AddScoped<LoginQueryHandler>();
 builder.Services.AddScoped<CreateEventCommandHandle>();
+builder.Services.AddScoped<UploadEventImageCommandHandle>();
 builder.Services.AddScoped<UpdateEventCommandHandle>();
 builder.Services.AddScoped<CancelRegistrationCommandHandleMock>();
 builder.Services.AddScoped<CreateRegistrationCommandHandle>();
@@ -214,6 +215,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.UseStaticFiles();
 app.UseHttpsRedirection();
 app.UseCors("AllowFrontend"); // Используем CORS политику
 app.UseAuthentication();

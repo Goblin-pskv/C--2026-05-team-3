@@ -33,6 +33,22 @@ namespace EventFlow.API.Controllers
             return HandleResult(result);
         }
         /// <summary>
+        /// Загрузка изображения для мероприятия
+        /// </summary>
+        /// <param name="eventId">ID мероприятия</param>
+        /// <param name="image">Файл изображения</param>
+        /// <returns>URL загруженного изображения</returns>
+        [HttpPost("upload-image/{eventId}")]
+        public async Task<IActionResult> UploadEventImage(Guid eventId, IFormFile image)
+        {
+            Guid? userId = GetUserId();
+            if (userId is null)
+                return Unauthorized();
+            var command = new UploadEventImageCommand(eventId, image, (Guid)userId);
+            var result = await _mediator.Send(command);
+            return HandleResult(result);
+        }
+        /// <summary>
         /// Получение данных о мероприятии
         /// </summary>
         /// <param name="eventId"></param>

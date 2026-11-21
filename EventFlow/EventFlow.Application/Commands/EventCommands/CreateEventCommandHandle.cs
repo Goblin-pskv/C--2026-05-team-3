@@ -69,7 +69,8 @@ namespace EventFlow.Application.Commands.EventCommands
                 MaxParticipants = request.MaxParticipants,
                 OrganizerId = organizer.Id,
                 Status = request.Status,
-                IsPublished = request.Status == EventStatus.Published
+                IsPublished = request.Status is EventStatus.Published or EventStatus.InProgress or EventStatus.Completed,
+                ImageUrl = request.ImageUrl
             };
 
             try
