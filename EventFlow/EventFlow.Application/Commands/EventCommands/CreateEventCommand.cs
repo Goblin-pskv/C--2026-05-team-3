@@ -20,5 +20,5 @@ namespace EventFlow.Application.Commands.EventCommands
         Guid UserId,
         EventStatus Status,
         string? ImageUrl = null
-        ) : IRequest<Result>;
+        ) : IRequest<Result<Guid>>;
 }

@@ -13,7 +13,7 @@ using System.Text;
 
 namespace EventFlow.Application.Commands.EventCommands
 {
-    public class CreateEventCommandHandle : IRequestHandler<CreateEventCommand, Result>
+    public class CreateEventCommandHandle : IRequestHandler<CreateEventCommand, Result<Guid>>
     {
 
         private readonly IValidator<CreateEventCommand> _validator;
@@ -35,7 +35,7 @@ namespace EventFlow.Application.Commands.EventCommands
 
 
 
-        public async Task<Result> Handle(CreateEventCommand request, CancellationToken cancellationToken)
+        public async Task<Result<Guid>> Handle(CreateEventCommand request, CancellationToken cancellationToken)
         {
             _logger.LogInformation(
                              "Регистрация начата для мероприятия: {Title})",
@@ -46,14 +46,14 @@ namespace EventFlow.Application.Commands.EventCommands
             {
                 var errors = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage));
                 _logger.LogWarning("Ошибка валидации при создании нового события: {Errors}", errors);
-                return Result.Failure(errors, 422);
+                return Result<Guid>.Failure(errors, 422);
             }
 
             var organizer = await _organizerRepository.GetByUserIdAsync(request.UserId, cancellationToken);
             if (organizer == null)
             {
                 _logger.LogWarning("Организатор не найден для UserId: {UserId}", request.UserId);
-                return Result.Failure("Пользователь не является организатором", 404);
+                return Result<Guid>.Failure("Пользователь не является организатором", 404);
             }
 
             var new_event = new Event
@@ -79,13 +79,13 @@ namespace EventFlow.Application.Commands.EventCommands
                 await _eventRepository.SaveChangesAsync(cancellationToken);
 
                 _logger.LogInformation("Мероприятие {Title} успешно создано", request.Title);
-                return Result.Success();
+                return Result<Guid>.Success(new_event.Id);
             }
             catch (DbUpdateException dbEx)
             {
                 var inner = dbEx.InnerException?.Message ?? dbEx.Message;
                 _logger.LogError(dbEx, "Ошибка сохранения: {Inner}", inner);
-                return Result.Failure($"Ошибка сохранения: {inner}", 500);
+                return Result<Guid>.Failure($"Ошибка сохранения: {inner}", 500);
             }
             catch (Exception ex)
             {
@@ -95,7 +95,7 @@ namespace EventFlow.Application.Commands.EventCommands
                     ex.Message
                 );
 
-                return Result.Failure($"Ошибка создания мероприятия: {ex.Message}", 500);
+                return Result<Guid>.Failure($"Ошибка создания мероприятия: {ex.Message}", 500);
             }
         }
     }

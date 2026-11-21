@@ -29,7 +29,7 @@ namespace EventFlow.API.Controllers
             if (userId is null)
                 return Unauthorized();
             var commandWithOwner = command with { UserId = (Guid)userId };
-            Result? result = await _mediator.Send(commandWithOwner);
+            Result<Guid>? result = await _mediator.Send(commandWithOwner);
             return HandleResult(result);
         }
         /// <summary>
