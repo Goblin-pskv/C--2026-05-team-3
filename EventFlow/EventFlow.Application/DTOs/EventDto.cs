@@ -70,5 +70,8 @@ namespace EventFlow.Application.DTOs
 
         /// <summary>Дата создания</summary>
         public DateTime CreatedAt { get; set; }
+
+        /// <summary>Зарегистрирован ли текущий пользователь на это мероприятие (учитывается только для авторизованных пользователей)</summary>
+        public bool IsUserRegistered { get; set; }
     }
 }

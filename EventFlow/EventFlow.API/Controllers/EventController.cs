@@ -70,10 +70,11 @@ namespace EventFlow.API.Controllers
         [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetEventsListQuery(
-            [FromQuery] int page = 0, 
+            [FromQuery] int page = 0,
             [FromQuery] int pageSize = 10)
         {
-            var query = new GetEventsListQuery(page, pageSize);
+            Guid? userId = GetUserId();
+            var query = new GetEventsListQuery(page, pageSize, UserId: userId);
             var result = await _mediator.Send(query);
             return HandleResult(result);
         }

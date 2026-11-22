@@ -12,13 +12,16 @@ namespace EventFlow.Application.Queries.EventQueries
     public class GetEventsListQueryHandler : IRequestHandler<GetEventsListQuery, Result<PageResponse<EventDto>>>
     {
         private readonly IEventRepository _eventRepository;
+        private readonly IRegistrationRepository _registrationRepository;
         private readonly ILogger<GetEventsListQueryHandler> _logger;
 
         public GetEventsListQueryHandler(
             IEventRepository eventRepository,
+            IRegistrationRepository registrationRepository,
             ILogger<GetEventsListQueryHandler> logger)
         {
             _eventRepository = eventRepository;
+            _registrationRepository = registrationRepository;
             _logger = logger;
         }
 
@@ -33,6 +36,15 @@ namespace EventFlow.Application.Queries.EventQueries
                     request.Page,
                     request.PageSize,
                     cancellationToken);
+
+                // Если пользователь авторизован — загружаем его регистрации одним запросом
+                HashSet<Guid>? registeredEventIds = null;
+                if (request.UserId.HasValue)
+                {
+                    var registrations = await _registrationRepository.GetRegistrationsByUserIdAsync(
+                        request.UserId.Value, cancellationToken);
+                    registeredEventIds = new HashSet<Guid>(registrations.Select(r => r.EventId));
+                }
 
                 var dtos = events.Select(e => new EventDto
                 {
@@ -49,7 +61,8 @@ namespace EventFlow.Application.Queries.EventQueries
                     IsPublished = e.IsPublished,
                     Status = e.Status.ToString(),
                     ImageUrl = e.ImageUrl,
-                    CreatedAt = e.CreatedAt
+                    CreatedAt = e.CreatedAt,
+                    IsUserRegistered = registeredEventIds != null && registeredEventIds.Contains(e.Id)
                 }).ToList();
 
                 var enumTypes = Enum.GetValues<EventType>()
