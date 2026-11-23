@@ -25,6 +25,12 @@ namespace EventFlow.Domain.Enums
         /// <summary>
         /// Вернули шекели
         /// </summary>
-        Returned = 3
+        Returned = 3,
+
+        /// <summary>
+        /// Обработка. Платёж инициирован и ожидает подтверждения банком.
+        /// Промежуточный статус между Pending и Confirmed.
+        /// </summary>
+        Processing = 4
     }
 }

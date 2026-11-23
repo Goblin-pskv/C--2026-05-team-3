@@ -1,8 +1,8 @@
-﻿using EventFlow.Application.Queries.TicketQueries;
+﻿using EventFlow.Application.Commands.TicketCommands;
+using EventFlow.Application.Queries.TicketQueries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Cryptography.X509Certificates;
 
 namespace EventFlow.API.Controllers
 {
@@ -49,6 +49,24 @@ namespace EventFlow.API.Controllers
         }
 
         /// <summary>
+        /// Создать билет для мероприятия (после регистрации)
+        /// </summary>
+        /// <param name="eventId">Id мероприятия</param>
+        /// <returns>ID созданного билета</returns>
+        [HttpPost("{eventId}")]
+        public async Task<IActionResult> CreateTicketCommand(Guid eventId)
+        {
+            Guid? userId = GetUserId();
+            if (userId == null)
+                return Unauthorized();
+
+            var command = new CreateTicketCommand(eventId, userId.Value);
+            var result = await _mediator.Send(command);
+
+            return HandleResult(result);
+        }
+
+        /// <summary>
         /// Возвращает список билетов по Id мероприятия
         /// </summary>
         /// <param name="eventId">Id мероприятия</param>
@@ -62,8 +80,6 @@ namespace EventFlow.API.Controllers
 
             return HandleResult(result);
         }
-
-        
     }
 }
 

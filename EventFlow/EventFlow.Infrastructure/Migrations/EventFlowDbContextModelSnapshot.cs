@@ -172,9 +172,6 @@ namespace EventFlow.Infrastructure.Migrations
                     b.Property<DateTime>("PaymentCreationDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("PaymentId")
-                        .HasColumnType("uuid");
-
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric");
 
@@ -293,9 +290,6 @@ namespace EventFlow.Infrastructure.Migrations
 
                     b.Property<DateTime>("TicketCreationDate")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("TicketId")
-                        .HasColumnType("uuid");
 
                     b.Property<string>("TicketNumber")
                         .IsRequired()

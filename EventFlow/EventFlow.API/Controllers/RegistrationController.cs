@@ -32,7 +32,7 @@ namespace EventFlow.API.Controllers
                 return Unauthorized("Пользователь не авторизован");
                 
             var command = new CreateRegistrationCommand(eventId, userId.Value);
-            Result? result = await _mediator.Send(command);
+            var result = await _mediator.Send(command);
             return HandleResult(result);
         }
         /// <summary>

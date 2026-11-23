@@ -26,7 +26,7 @@ namespace EventFlow.API.Controllers
             Guid? userId = GetUserId();
             if (userId is null)
                 return Unauthorized();
-                
+
             var command = new InitiatePaymentCommand(ticketId, (Guid)userId);
             var result = await _mediator.Send(command);
 
@@ -37,7 +37,7 @@ namespace EventFlow.API.Controllers
         /// Подтвердить оплату
         /// </summary>
         /// <param name="id">ID платежа</param>
-        /// <returns>Результат операции</returns>
+        /// <returns>Данные платежа со статусом Processing</returns>
         [HttpPost("{id:guid}/confirm")]
         public async Task<IActionResult> ConfirmPaymentCommand(Guid id)
         {
@@ -46,6 +46,24 @@ namespace EventFlow.API.Controllers
                 return Unauthorized();
 
             var command = new ConfirmPaymentCommand(id, (Guid)userId);
+            var result = await _mediator.Send(command);
+
+            return HandleResult(result);
+        }
+
+        /// <summary>
+        /// Отменить платёж
+        /// </summary>
+        /// <param name="id">ID платежа</param>
+        /// <returns>Данные платежа со статусом Cancelled</returns>
+        [HttpPost("{id:guid}/cancel")]
+        public async Task<IActionResult> CancelPaymentCommand(Guid id)
+        {
+            Guid? userId = GetUserId();
+            if (userId is null)
+                return Unauthorized();
+
+            var command = new CancelPaymentCommand(id, (Guid)userId);
             var result = await _mediator.Send(command);
 
             return HandleResult(result);

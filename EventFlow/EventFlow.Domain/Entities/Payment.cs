@@ -10,10 +10,6 @@ namespace EventFlow.Domain.Entities
     {
 
         /// <summary>
-        /// ID платежа.
-        /// </summary>
-        public Guid PaymentId { get; set; }
-        /// <summary>
         /// ID билета, к которому относится платёж.
         /// Внешний ключ на таблицу Tickets.
         /// </summary>

@@ -16,6 +16,8 @@ namespace EventFlow.Tests
     {
         private readonly Mock<IRegistrationRepository> _registrationRepositoryMock;
         private readonly Mock<IEventRepository> _eventRepositoryMock;
+        private readonly Mock<ITicketRepository> _ticketRepositoryMock;
+        private readonly Mock<IUnitOfWork> _unitOfWorkMock;
         private readonly Mock<IValidator<CreateRegistrationCommand>> _validatorMock;
         private readonly Mock<ILogger<CreateRegistrationCommandHandle>> _loggerMock;
         private readonly CreateRegistrationCommandHandle _handler;
@@ -24,12 +26,16 @@ namespace EventFlow.Tests
         {
             _registrationRepositoryMock = new Mock<IRegistrationRepository>();
             _eventRepositoryMock = new Mock<IEventRepository>();
+            _ticketRepositoryMock = new Mock<ITicketRepository>();
+            _unitOfWorkMock = new Mock<IUnitOfWork>();
             _validatorMock = new Mock<IValidator<CreateRegistrationCommand>>();
             _loggerMock = new Mock<ILogger<CreateRegistrationCommandHandle>>();
-            
+
             _handler = new CreateRegistrationCommandHandle(
                 _registrationRepositoryMock.Object,
                 _eventRepositoryMock.Object,
+                _ticketRepositoryMock.Object,
+                _unitOfWorkMock.Object,
                 _validatorMock.Object,
                 _loggerMock.Object);
         }

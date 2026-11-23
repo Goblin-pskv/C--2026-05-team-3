@@ -9,8 +9,7 @@ namespace EventFlow.Application.DTOs
     {
 
         public Guid Id { get; set; }
-        public Guid PaymentId { get; set; }
-   
+
         public Guid TicketId { get; set; }
         public Guid UserId { get; set; }
         public decimal Price { get; set; }
@@ -20,6 +19,10 @@ namespace EventFlow.Application.DTOs
         public DateTime? LastModificationDate { get; set; }
         public DateTime? PaidAt { get; set; }
 
+        /// <summary>
+        /// Относительный URL фейкового экрана оплаты. Фронтенд переходит по нему для подтверждения платежа.
+        /// </summary>
+        public string? PayUrl { get; set; }
 
     }
 }

@@ -22,9 +22,9 @@ namespace EventFlow.Domain.Entities
         public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
 
         /// <summary>
-        /// ID билета.
+        /// ID билета (первичный ключ).
         /// </summary>
-        public Guid TicketId { get; set; }
+        public Guid Id { get; set; }
 
         /// <summary>
         /// ID мероприятия, на которое регистрируется пользователь.

@@ -19,7 +19,6 @@ namespace EventFlow.Domain.Enums
 
         /// <summary>
         /// Отменена. Пользователь или организатор отменил билет.
-        /// ???? я хз мб после возвращения денег ????
         /// </summary>
         Cancelled = 2,
 

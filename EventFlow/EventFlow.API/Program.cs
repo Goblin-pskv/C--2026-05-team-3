@@ -1,5 +1,3 @@
-using System.Reflection;
-using System.Text;
 using EventFlow.Application.Behaviors;
 using EventFlow.Application.Commands.AuthCommands;
 using EventFlow.Application.Commands.EventCommands;
@@ -7,14 +5,18 @@ using EventFlow.Application.Commands.OrganizerCommands;
 using EventFlow.Application.Commands.PaymentCommands;
 using EventFlow.Application.Commands.RegisterCommand;
 using EventFlow.Application.Commands.RegistrationCommands;
+using EventFlow.Application.Commands.TicketCommands;
 using EventFlow.Application.Commands.UpdateProfileCommand;
+using EventFlow.Application.Handlers;
 using EventFlow.Application.Interfaces;
+using EventFlow.Application.Messages;
 using EventFlow.Application.Queries.EventQueries;
 using EventFlow.Application.Queries.GetProfileQuery;
 using EventFlow.Application.Queries.LoginQuery;
 using EventFlow.Application.Queries.OrganizerQueries;
 using EventFlow.Application.Queries.PaymentQueries;
 using EventFlow.Application.Queries.RegistrationQueries;
+using EventFlow.Application.Queries.TicketQueries;
 using EventFlow.Domain.Entities;
 using EventFlow.Infrastructure.Data;
 using EventFlow.Infrastructure.Repositories;
@@ -28,6 +30,10 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using Serilog;
 using Serilog.Sinks.PostgreSQL;
+using System.Reflection;
+using System.Text;
+using Wolverine;
+using Wolverine.RabbitMQ;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -146,6 +152,10 @@ builder.Services.AddScoped<InitiatePaymentCommandHandler>();
 builder.Services.AddScoped<ConfirmPaymentCommandHandler>();
 builder.Services.AddScoped<PaymentStatusQueryHandler>();
 builder.Services.AddScoped<PaymentsQueryHandler>();
+builder.Services.AddScoped<GetMyTicketsQueryHandler>();
+builder.Services.AddScoped<GetTicketQueryHandler>();
+builder.Services.AddScoped<GetTicketsEventQueryHandler>();
+builder.Services.AddScoped<CreateTicketCommandHandle>();
 builder.Services.AddScoped<JwtSettings>();
 builder.Services.AddIdentity<User, IdentityRole<Guid>>().AddEntityFrameworkStores<EventFlowDbContext>().AddDefaultTokenProviders();
 builder.Services.AddScoped(typeof(ITokenService), typeof(TokenService));
@@ -191,6 +201,29 @@ builder.Services.AddDbContext<EventFlowDbContext>(options =>
 
 builder.Services.AddProblemDetails(); // обработка ошибок
 
+builder.Host.UseWolverine(opts =>
+{
+    // Подключение к локальному RabbitMQ
+    opts.UseRabbitMq(new Uri("amqp://admin:admin123@localhost:5672")).AutoProvision().DeclareQueue("payment-processing", q =>
+    {
+        q.IsDurable = true;
+        q.AutoDelete = false;
+    });
+
+    // Слушаем очередь (Wolverine сам запустит фоновый listener)
+    opts.ListenToRabbitQueue("payment-processing");
+    opts.PublishMessage<BankResponseSimulated>()
+    .ToRabbitQueue("payment-processing");
+    // Включаем durable outbox, чтобы отложенные сообщения переживали перезапуск
+    opts.Policies.UseDurableOutboxOnAllSendingEndpoints();
+    // Разрешаем service location только для вашего DbContext
+    opts.CodeGeneration.AlwaysUseServiceLocationFor<EventFlow.Infrastructure.Data.EventFlowDbContext>();
+    // Автоматически находим все Handle-методы в сборках API и Application
+    opts.Discovery.IncludeAssembly(typeof(Program).Assembly);
+    opts.Discovery.IncludeAssembly(typeof(EventFlow.Application.Commands.PaymentCommands.InitiatePaymentCommand).Assembly);
+    opts.Discovery.IncludeAssembly(typeof(EventFlow.Application.Handlers.BankResponseHandler).Assembly);
+
+});
 var app = builder.Build();
 
 app.UseSerilogRequestLogging(); // логируем все http запросы
@@ -209,7 +242,6 @@ using (var scope = app.Services.CreateScope())
         Log.Error(ex, "Ошибка при создании ролей");
     }
 }
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

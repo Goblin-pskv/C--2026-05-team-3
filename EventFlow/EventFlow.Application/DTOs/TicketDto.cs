@@ -8,7 +8,6 @@ namespace EventFlow.Application.DTOs
     public class TicketDto
     {
         public Guid Id { get; set; }
-        public Guid TicketId { get; set; }    
         public Guid EventId { get; set; }
         public Guid UserId { get; set; }
         public string TicketNumber { get; set; } = null!;
