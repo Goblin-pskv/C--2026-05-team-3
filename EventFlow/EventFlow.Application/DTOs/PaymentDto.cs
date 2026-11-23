@@ -14,7 +14,7 @@ namespace EventFlow.Application.DTOs
         public Guid UserId { get; set; }
         public decimal Price { get; set; }
 
-        public PaymentStatus Status { get; set; }
+        public string Status { get; set; }
         public DateTime PaymentCreationDate { get; set; }
         public DateTime? LastModificationDate { get; set; }
         public DateTime? PaidAt { get; set; }

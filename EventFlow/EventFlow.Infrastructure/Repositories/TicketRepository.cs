@@ -121,5 +121,34 @@ namespace EventFlow.Infrastructure.Repositories
                 .CountAsync(t => t.EventId == eventId
                               && t.status == TicketStatus.Confirmed, ct);
         }
+
+        /// <summary>
+        /// Количество активных (Pending + Confirmed) билетов на мероприятие.
+        /// </summary>
+        public async Task<int> CountActiveAsync(Guid eventId, CancellationToken ct)
+        {
+            return await _dbSet
+                .CountAsync(t => t.EventId == eventId
+                              && (t.status == TicketStatus.Pending
+                               || t.status == TicketStatus.Confirmed), ct);
+        }
+
+        /// <summary>
+        /// Возвращает словарь: EventId → количество активных билетов.
+        /// Один запрос для списка событий — избегает N+1.
+        /// </summary>
+        public async Task<Dictionary<Guid, int>> GetActiveTicketCountByEventIdsAsync(
+            List<Guid> eventIds, CancellationToken ct)
+        {
+            var result = await _dbSet
+                .Where(t => eventIds.Contains(t.EventId)
+                         && (t.status == TicketStatus.Pending
+                          || t.status == TicketStatus.Confirmed))
+                .GroupBy(t => t.EventId)
+                .Select(g => new { EventId = g.Key, Count = g.Count() })
+                .ToListAsync(ct);
+
+            return result.ToDictionary(r => r.EventId, r => r.Count);
+        }
     }
 }

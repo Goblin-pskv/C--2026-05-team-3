@@ -65,7 +65,7 @@ namespace EventFlow.Application.Commands.PaymentCommands
                 TicketId = payment.TicketId,
                 UserId = payment.UserId,
                 Price = payment.Price,
-                Status = PaymentStatus.Processing,
+                Status = EnumHelper.GetDescription(PaymentStatus.Processing),
                 PaymentCreationDate = payment.PaymentCreationDate,
                 LastModificationDate = payment.LastModificationDate
             });

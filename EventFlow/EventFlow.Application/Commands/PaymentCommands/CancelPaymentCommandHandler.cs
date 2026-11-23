@@ -10,13 +10,22 @@ namespace EventFlow.Application.Commands.PaymentCommands
     public class CancelPaymentCommandHandler : IRequestHandler<CancelPaymentCommand, Result<PaymentDto>>
     {
         private readonly IPaymentRepository _paymentRepository;
+        private readonly ITicketRepository _ticketRepository;
+        private readonly IRegistrationRepository _registrationRepository;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<CancelPaymentCommandHandler> _logger;
 
         public CancelPaymentCommandHandler(
             IPaymentRepository paymentRepository,
+            ITicketRepository ticketRepository,
+            IRegistrationRepository registrationRepository,
+            IUnitOfWork unitOfWork,
             ILogger<CancelPaymentCommandHandler> logger)
         {
             _paymentRepository = paymentRepository;
+            _ticketRepository = ticketRepository;
+            _registrationRepository = registrationRepository;
+            _unitOfWork = unitOfWork;
             _logger = logger;
         }
 
@@ -43,23 +52,49 @@ namespace EventFlow.Application.Commands.PaymentCommands
                 return Result<PaymentDto>.Failure($"Нельзя отменить платёж в статусе {payment.Status}", 409);
             }
 
-            payment.Status = PaymentStatus.Cancelled;
-            payment.LastModificationDate = DateTime.UtcNow;
-            await _paymentRepository.UpdateAsync(payment, ct);
-            await _paymentRepository.SaveChangesAsync(ct);
-
-            _logger.LogInformation("Платёж {Id} переведён в статус Cancelled", payment.Id);
-
-            return Result<PaymentDto>.Success(new PaymentDto
+            await _unitOfWork.BeginTransactionAsync(ct);
+            try
             {
-                Id = payment.Id,
-                TicketId = payment.TicketId,
-                UserId = payment.UserId,
-                Price = payment.Price,
-                Status = PaymentStatus.Cancelled,
-                PaymentCreationDate = payment.PaymentCreationDate,
-                LastModificationDate = payment.LastModificationDate
-            });
+                payment.Status = PaymentStatus.Cancelled;
+                payment.LastModificationDate = DateTime.UtcNow;
+                await _paymentRepository.UpdateAsync(payment, ct);
+
+                var ticket = await _ticketRepository.GetByIdWithIncludesAsync(payment.TicketId, ct);
+                if (ticket != null)
+                {
+                    ticket.status = TicketStatus.Cancelled;
+                    ticket.LastModificationDate = DateTime.UtcNow;
+                    await _ticketRepository.UpdateAsync(ticket, ct);
+                }
+
+                var registration = await _registrationRepository.GetRegistrationAsync(payment.UserId, ticket!.EventId, ct);
+                if (registration != null && registration.Status != RegistrationStatus.Cancelled)
+                {
+                    registration.Cancel();
+                    await _registrationRepository.UpdateAsync(registration, ct);
+                }
+
+                await _unitOfWork.SaveChangesAsync(ct);
+                await _unitOfWork.CommitAsync(ct);
+
+                _logger.LogInformation("Платёж {Id} переведён в статус Cancelled", payment.Id);
+
+                return Result<PaymentDto>.Success(new PaymentDto
+                {
+                    Id = payment.Id,
+                    TicketId = payment.TicketId,
+                    UserId = payment.UserId,
+                    Price = payment.Price,
+                    Status = EnumHelper.GetDescription(PaymentStatus.Cancelled),
+                    PaymentCreationDate = payment.PaymentCreationDate,
+                    LastModificationDate = payment.LastModificationDate
+                });
+            }
+            catch
+            {
+                await _unitOfWork.RollbackAsync(ct);
+                throw;
+            }
         }
     }
 }

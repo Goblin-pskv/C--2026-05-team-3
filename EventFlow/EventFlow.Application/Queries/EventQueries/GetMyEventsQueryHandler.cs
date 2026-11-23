@@ -4,8 +4,6 @@ using EventFlow.Application.Interfaces;
 using EventFlow.Domain.Enums;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using System.ComponentModel;
-using System.Reflection;
 
 namespace EventFlow.Application.Queries.EventQueries
 {
@@ -65,15 +63,9 @@ namespace EventFlow.Application.Queries.EventQueries
                     TotalCount = totalCount
                 };
 
-                var enumTypes = Enum.GetValues<EventType>()
-                    .ToDictionary(
-                        e => e.ToString(),
-                        e => GetDescription(e));
+                var enumTypes = EnumHelper.GetEnumDictionary<EventType>();
 
-                var enumStatuses = Enum.GetValues<EventStatus>()
-                    .ToDictionary(
-                        e => e.ToString(),
-                        e => GetDescription(e));
+                var enumStatuses = EnumHelper.GetEnumDictionary<EventStatus>();
 
                 _logger.LogInformation("Успешно получено {Count} мероприятий из {TotalCount}", dtos.Count, totalCount);
                 return Result<PageResponse<EventDto>>.Success(new PageResponse<EventDto>
@@ -87,13 +79,6 @@ namespace EventFlow.Application.Queries.EventQueries
                 _logger.LogError(ex, "Ошибка при получении списка мероприятий организатора {OrganizerId}", request.OrganizerId);
                 return Result<PageResponse<EventDto>>.Failure("Произошла ошибка при получении списка мероприятий", 500);
             }
-        }
-
-        private static string GetDescription(Enum value)
-        {
-            var member = value.GetType().GetMember(value.ToString()).FirstOrDefault();
-            var attribute = member?.GetCustomAttribute<DescriptionAttribute>();
-            return attribute?.Description ?? value.ToString();
         }
     }
 }

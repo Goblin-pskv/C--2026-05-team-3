@@ -83,8 +83,8 @@ namespace EventFlow.Application.Commands.RegistrationCommands
 
             if (@event.MaxParticipants.HasValue)
             {
-                var currentCount = await _registrationRepository
-                    .CountConfirmedAsync(request.EventId, cancellationToken);
+                var currentCount = await _ticketRepository
+                    .CountActiveAsync(request.EventId, cancellationToken);
 
                 if (currentCount >= @event.MaxParticipants.Value)
                 {
@@ -179,6 +179,11 @@ namespace EventFlow.Application.Commands.RegistrationCommands
                 if (existingTicket != null)
                 {
                     ticketId = existingTicket.Id;
+                    if (existingTicket.status == TicketStatus.Cancelled)
+                    {
+                        existingTicket.status = TicketStatus.Pending;
+                        await _ticketRepository.UpdateAsync(existingTicket, ct);
+                    }
                 }
                 else
                 {

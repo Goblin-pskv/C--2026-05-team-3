@@ -58,5 +58,17 @@ namespace EventFlow.Application.Interfaces
         /// Используется для проверки лимита MaxParticipants.
         /// </summary>
         Task<int> CountConfirmedAsync(Guid eventId, CancellationToken ct);
+
+        /// <summary>
+        /// Считает количество активных (Pending + Confirmed) билетов на мероприятие.
+        /// Используется для проверки заполняемости — Expired и Cancelled не учитываются.
+        /// </summary>
+        Task<int> CountActiveAsync(Guid eventId, CancellationToken ct);
+
+        /// <summary>
+        /// Возвращает словарь: EventId → количество активных билетов.
+        /// Один запрос для списка событий — избегает N+1.
+        /// </summary>
+        Task<Dictionary<Guid, int>> GetActiveTicketCountByEventIdsAsync(List<Guid> eventIds, CancellationToken ct);
     }
 }

@@ -42,7 +42,7 @@ namespace EventFlow.Application.Queries.PaymentQueries
                 TicketId = payment.TicketId,
                 UserId = payment.UserId,
                 Price = payment.Price,
-                Status = payment.Status,
+                Status = EnumHelper.GetDescription(payment.Status),
                 PaymentCreationDate = payment.PaymentCreationDate,
                 LastModificationDate = payment.LastModificationDate,
                 PaidAt = payment.PaidAt

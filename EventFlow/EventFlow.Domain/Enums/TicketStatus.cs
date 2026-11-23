@@ -1,31 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
 
 namespace EventFlow.Domain.Enums
 {
     public enum TicketStatus
     {
-        /// <summary>
-        /// Ожидает подтверждения. Создана, но не подтверждена.
-        /// </summary>
+        [Description("Ожидание")]
         Pending = 0,
 
-        /// <summary>
-        /// Подтвержден.
-        /// Оплата прошла (появилась запись в таблице)
-        /// </summary>
+        [Description("Подтверждён")]
         Confirmed = 1,
 
-        /// <summary>
-        /// Отменена. Пользователь или организатор отменил билет.
-        /// </summary>
+        [Description("Отменён")]
         Cancelled = 2,
 
-        /// <summary>
-        /// Просрочен
-        /// Если билет не был подтвержден до конца мероприятия
-        /// </summary>
+        [Description("Просрочен")]
         Expired = 3
     }
 }

@@ -4,8 +4,6 @@ using EventFlow.Application.Interfaces;
 using EventFlow.Domain.Enums;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using System.ComponentModel;
-using System.Reflection;
 
 namespace EventFlow.Application.Queries.EventQueries
 {
@@ -13,15 +11,18 @@ namespace EventFlow.Application.Queries.EventQueries
     {
         private readonly IEventRepository _eventRepository;
         private readonly IRegistrationRepository _registrationRepository;
+        private readonly ITicketRepository _ticketRepository;
         private readonly ILogger<GetEventsListQueryHandler> _logger;
 
         public GetEventsListQueryHandler(
             IEventRepository eventRepository,
             IRegistrationRepository registrationRepository,
+            ITicketRepository ticketRepository,
             ILogger<GetEventsListQueryHandler> logger)
         {
             _eventRepository = eventRepository;
             _registrationRepository = registrationRepository;
+            _ticketRepository = ticketRepository;
             _logger = logger;
         }
 
@@ -43,8 +44,14 @@ namespace EventFlow.Application.Queries.EventQueries
                 {
                     var registrations = await _registrationRepository.GetRegistrationsByUserIdAsync(
                         request.UserId.Value, cancellationToken);
-                    registeredEventIds = new HashSet<Guid>(registrations.Select(r => r.EventId));
+                    registeredEventIds = new HashSet<Guid>(registrations
+                        .Where(r => r.Status != RegistrationStatus.Cancelled)
+                        .Select(r => r.EventId));
                 }
+
+                // Загружаем активные билеты для всех событий одной пачкой запросов
+                var activeTicketCounts = await _ticketRepository.GetActiveTicketCountByEventIdsAsync(
+                    events.Select(e => e.Id).ToList(), cancellationToken);
 
                 var dtos = events.Select(e => new EventDto
                 {
@@ -62,18 +69,16 @@ namespace EventFlow.Application.Queries.EventQueries
                     Status = e.Status.ToString(),
                     ImageUrl = e.ImageUrl,
                     CreatedAt = e.CreatedAt,
+                    CurrentParticipants = activeTicketCounts.TryGetValue(e.Id, out var count) ? count : 0,
+                    AvailableSpots = e.MaxParticipants.HasValue
+                        ? e.MaxParticipants.Value - (activeTicketCounts.TryGetValue(e.Id, out count) ? count : 0)
+                        : 0,
                     IsUserRegistered = registeredEventIds != null && registeredEventIds.Contains(e.Id)
                 }).ToList();
 
-                var enumTypes = Enum.GetValues<EventType>()
-                    .ToDictionary(
-                        e => e.ToString(),
-                        e => GetDescription(e));
+                var enumTypes = EnumHelper.GetEnumDictionary<EventType>();
 
-                var enumStatuses = Enum.GetValues<EventStatus>()
-                    .ToDictionary(
-                        e => e.ToString(),
-                        e => GetDescription(e));
+                var enumStatuses = EnumHelper.GetEnumDictionary<EventStatus>();
 
                 _logger.LogInformation("Успешно получено {Count} мероприятий из {TotalCount}", dtos.Count, totalCount);
                 return Result<PageResponse<EventDto>>.Success(new PageResponse<EventDto>
@@ -91,13 +96,6 @@ namespace EventFlow.Application.Queries.EventQueries
                 _logger.LogError(ex, "Ошибка при получении списка мероприятий");
                 return Result<PageResponse<EventDto>>.Failure("Произошла ошибка при получении списка мероприятий", 500);
             }
-        }
-
-        private static string GetDescription(Enum value)
-        {
-            var member = value.GetType().GetMember(value.ToString()).FirstOrDefault();
-            var attribute = member?.GetCustomAttribute<DescriptionAttribute>();
-            return attribute?.Description ?? value.ToString();
         }
     }
 }
