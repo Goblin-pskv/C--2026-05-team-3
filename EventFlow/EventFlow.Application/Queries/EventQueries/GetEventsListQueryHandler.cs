@@ -10,18 +10,15 @@ namespace EventFlow.Application.Queries.EventQueries
     public class GetEventsListQueryHandler : IRequestHandler<GetEventsListQuery, Result<PageResponse<EventDto>>>
     {
         private readonly IEventRepository _eventRepository;
-        private readonly IRegistrationRepository _registrationRepository;
         private readonly ITicketRepository _ticketRepository;
         private readonly ILogger<GetEventsListQueryHandler> _logger;
 
         public GetEventsListQueryHandler(
             IEventRepository eventRepository,
-            IRegistrationRepository registrationRepository,
             ITicketRepository ticketRepository,
             ILogger<GetEventsListQueryHandler> logger)
         {
             _eventRepository = eventRepository;
-            _registrationRepository = registrationRepository;
             _ticketRepository = ticketRepository;
             _logger = logger;
         }
@@ -38,15 +35,14 @@ namespace EventFlow.Application.Queries.EventQueries
                     request.PageSize,
                     cancellationToken);
 
-                // Если пользователь авторизован — загружаем его регистрации одним запросом
+                // Если пользователь авторизован — загружаем его активные билеты одним запросом
                 HashSet<Guid>? registeredEventIds = null;
                 if (request.UserId.HasValue)
                 {
-                    var registrations = await _registrationRepository.GetRegistrationsByUserIdAsync(
-                        request.UserId.Value, cancellationToken);
-                    registeredEventIds = new HashSet<Guid>(registrations
-                        .Where(r => r.Status != RegistrationStatus.Cancelled)
-                        .Select(r => r.EventId));
+                    var tickets = await _ticketRepository.GetByUserAsync(request.UserId.Value, cancellationToken);
+                    registeredEventIds = new HashSet<Guid>(tickets
+                        .Where(t => t.status == TicketStatus.Confirmed)
+                        .Select(t => t.EventId));
                 }
 
                 // Загружаем активные билеты для всех событий одной пачкой запросов
