@@ -1,4 +1,3 @@
-
 C:.
 │   .dockerignore
 │   EventFlow.slnx
@@ -7,182 +6,169 @@ C:.
 │   │   appsettings.Development.json
 │   │   appsettings.json
 │   │   EventFlow.API.csproj
-│   │   EventFlow.API.http
 │   │   Program.cs
 │   │
-│   ├───bin
-│   │   └───Debug
-│   │       └───net10.0
-│   │               appsettings.Development.json
-│   │               appsettings.json
-│   │               AutoMapper.dll
-│   │               EventFlow.API.deps.json
-│   │               EventFlow.API.dll
-│   │               EventFlow.API.exe
-│   │               EventFlow.API.pdb
-│   │               EventFlow.API.runtimeconfig.json
-│   │               EventFlow.API.staticwebassets.endpoints.json
-│   │               EventFlow.Application.dll
-│   │               EventFlow.Application.pdb
-│   │               EventFlow.Domain.dll
-│   │               EventFlow.Domain.pdb
-│   │               EventFlow.Infrastructure.dll
-│   │               EventFlow.Infrastructure.pdb
-│   │               FluentValidation.dll
-│   │               Microsoft.AspNetCore.Authentication.JwtBearer.dll
-│   │               Microsoft.EntityFrameworkCore.Abstractions.dll
-│   │               Microsoft.EntityFrameworkCore.dll
-│   │               Microsoft.EntityFrameworkCore.Relational.dll
-│   │               Microsoft.IdentityModel.Abstractions.dll
-│   │               Microsoft.IdentityModel.JsonWebTokens.dll
-│   │               Microsoft.IdentityModel.Logging.dll
-│   │               Microsoft.IdentityModel.Protocols.dll
-│   │               Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
-│   │               Microsoft.IdentityModel.Tokens.dll
-│   │               Microsoft.OpenApi.dll
-│   │               Npgsql.dll
-│   │               Npgsql.EntityFrameworkCore.PostgreSQL.dll
-│   │               Swashbuckle.AspNetCore.Swagger.dll
-│   │               Swashbuckle.AspNetCore.SwaggerGen.dll
-│   │               Swashbuckle.AspNetCore.SwaggerUI.dll
-│   │               System.IdentityModel.Tokens.Jwt.dll
-│   │
 │   ├───Controllers
-│   │       BaseController.cs
+│   │   ├───Admin
+│   │   │       OrganizerController.cs
+│   │   ├───AuthController.cs
+│   │   ├───BaseController.cs
+│   │   ├───EventController.cs
+│   │   ├───OrganizerController.cs
+│   │   ├───PaymentsController.cs
+│   │   ├───RegistrationController.cs
+│   │   ├───TicketController.cs
+│   │   └───UserController.cs
 │   │
 │   ├───Extensions
 │   ├───Filters
-│   ├───Middleware
-│   ├───obj
-│   │   │   EventFlow.API.csproj.nuget.dgspec.json
-│   │   │   EventFlow.API.csproj.nuget.g.props
-│   │   │   EventFlow.API.csproj.nuget.g.targets
-│   │   │   project.assets.json
-│   │   │   project.nuget.cache
-│   │   │
-│   │   └───Debug
-│   │       └───net10.0
-│   │           │   .NETCoreApp,Version=v10.0.AssemblyAttributes.cs
-│   │           │   ApiEndpoints.json
-│   │           │   apphost.exe
-│   │           │   EventFlo.C475C285.Up2Date
-│   │           │   EventFlow.API.AssemblyInfo.cs
-│   │           │   EventFlow.API.AssemblyInfoInputs.cache
-│   │           │   EventFlow.API.assets.cache
-│   │           │   EventFlow.API.csproj.AssemblyReference.cache
-│   │           │   EventFlow.API.csproj.CoreCompileInputs.cache
-│   │           │   EventFlow.API.csproj.FileListAbsolute.txt
-│   │           │   EventFlow.API.dll
-│   │           │   EventFlow.API.GeneratedMSBuildEditorConfig.editorconfig
-│   │           │   EventFlow.API.genruntimeconfig.cache
-│   │           │   EventFlow.API.GlobalUsings.g.cs
-│   │           │   EventFlow.API.MvcApplicationPartsAssemblyInfo.cache
-│   │           │   EventFlow.API.MvcApplicationPartsAssemblyInfo.cs
-│   │           │   EventFlow.API.pdb
-│   │           │   EventFlow.API.sourcelink.json
-│   │           │   ip1snkdo.5mp~
-│   │           │   rjsmcshtml.dswa.cache.json
-│   │           │   rjsmrazor.dswa.cache.json
-│   │           │   rpswa.dswa.cache.json
-│   │           │   staticwebassets.build.endpoints.json
-│   │           │   staticwebassets.build.json
-│   │           │   staticwebassets.build.json.cache
-│   │           │   staticwebassets.references.upToDateCheck.txt
-│   │           │   staticwebassets.removed.txt
-│   │           │   swae.build.ex.cache
-│   │           │
-│   │           ├───EndpointInfo
-│   │           │       EventFlow.API.json
-│   │           │       EventFlow.API.OpenApiFiles.cache
-│   │           │
-│   │           ├───ref
-│   │           │       EventFlow.API.dll
-│   │           │
-│   │           ├───refint
-│   │           │       EventFlow.API.dll
-│   │           │
-│   │           └───staticwebassets
-│   └───Properties
-│           launchSettings.json
+│   └───Middleware
 │
 ├───EventFlow.Application
 │   │   EventFlow.Application.csproj
 │   │
-│   ├───bin
-│   │   └───Debug
-│   │       └───net10.0
-│   │               EventFlow.Application.deps.json
-│   │               EventFlow.Application.dll
-│   │               EventFlow.Application.pdb
-│   │               EventFlow.Domain.dll
-│   │               EventFlow.Domain.pdb
+│   ├───Behaviors
+│   │       ValidationBehavior.cs
+│   │
+│   ├───Commands
+│   │   ├───AuthCommands
+│   │   │       ConfirmEmailCommand.cs
+│   │   │       ConfirmEmailCommandHandler.cs
+│   │   │       RefreshUserCommand.cs
+│   │   │       RefreshUserCommandHandler.cs
+│   │   │       RegisterUserCommand.cs
+│   │   │       RegisterUserCommandHandler.cs
+│   │   ├───EventCommands
+│   │   │       CreateEventCommand.cs
+│   │   │       CreateEventCommandHandle.cs
+│   │   │       UpdateEventCommand.cs
+│   │   │       UpdateEventCommandHandle.cs
+│   │   │       UploadEventImageCommand.cs
+│   │   │       UploadEventImageCommandHandle.cs
+│   │   ├───OrganizerCommands
+│   │   │       ApproveOrganizerCommand.cs
+│   │   │       ApproveOrganizerCommandHandler.cs
+│   │   │       CreateOrganizerRequestCommand.cs
+│   │   │       CreateOrganizerRequestCommandHandler.cs
+│   │   │       RejectOrganizerCommand.cs
+│   │   │       RejectOrganizerCommandHandler.cs
+│   │   ├───PaymentCommands
+│   │   │       CancelPaymentCommand.cs
+│   │   │       CancelPaymentCommandHandler.cs
+│   │   │       ConfirmPaymentCommand.cs
+│   │   │       ConfirmPaymentCommandHandler.cs
+│   │   │       InitiatePaymentCommand.cs
+│   │   │       InitiatePaymentCommandHandler.cs
+│   │   ├───RegistrationCommands
+│   │   │       CancelRegistrationCommand.cs
+│   │   │       CancelRegistrationCommandHandle.cs
+│   │   │       CreateRegistrationCommand.cs
+│   │   │       CreateRegistrationCommandHandle.cs
+│   │   ├───TicketCommands
+│   │   │       CreateTicketCommand.cs
+│   │   │       CreateTicketCommandHandle.cs
+│   │   └───UserCommands
+│   │           UpdateProfileCommand.cs
+│   │           UpdateProfileCommandHandler.cs
+│   │
+│   ├───Common
+│   │       EnumHelper.cs
+│   │       PaginatedResult.cs
+│   │       Result.cs
+│   │       └───Validators
+│   │               CancelRegistrationCommandValidator.cs
+│   │               CreateEventCommandValidator.cs
+│   │               CreateOrganizerRequestCommandValidator.cs
+│   │               CreateRegistrationCommandValidator.cs
+│   │               GetEventQueryValidator.cs
+│   │               GetEventRegistrationsQuery.cs
+│   │               GetProfileQueryValidator.cs
+│   │               GetUserRegistrationsQueryValidator.cs
+│   │               LoginQueryValidator.cs
+│   │               RegisterUserCommandValidator.cs
+│   │               UpdateEventCommandValidator.cs
+│   │               UpdateProfileCommandValidator.cs
 │   │
 │   ├───DTOs
+│   │       AuthResponseDto.cs
 │   │       CreateEventDto.cs
 │   │       EventDto.cs
 │   │       OrganizerDto.cs
+│   │       OrganizerProfileRequestDto.cs
+│   │       OrganizerRequestDto.cs
+│   │       PageResponse.cs
+│   │       PaymentDto.cs
 │   │       RegistrationDto.cs
+│   │       TicketDto.cs
 │   │       UpdateEventDto.cs
 │   │       UserDto.cs
 │   │
+│   ├───Handlers
+│   │       BankResponseHandler.cs
+│   │
 │   ├───Interfaces
+│   │       IEmailConfirmTokenService.cs
 │   │       IEventRepository.cs
 │   │       IEventService.cs
+│   │       IMessageService.cs
 │   │       IOrganizerRepository.cs
+│   │       IOrganizerRequestRepository.cs
+│   │       IPaymentRepository.cs
+│   │       IRefreshTokenService.cs
 │   │       IRegistrationRepository.cs
 │   │       IRegistrationService.cs
+│   │       IRepository.cs
+│   │       ITicketRepository.cs
+│   │       ITokenHasher.cs
+│   │       ITokenService.cs
 │   │       IUnitOfWork.cs
 │   │       IUserRepository.cs
+│   │       IValidationService.cs
 │   │
-│   ├───Mappings
-│   ├───obj
-│   │   │   EventFlow.Application.csproj.nuget.dgspec.json
-│   │   │   EventFlow.Application.csproj.nuget.g.props
-│   │   │   EventFlow.Application.csproj.nuget.g.targets
-│   │   │   project.assets.json
-│   │   │   project.nuget.cache
-│   │   │
-│   │   └───Debug
-│   │       ├───net10.0
-│   │       │   │   .NETCoreApp,Version=v10.0.AssemblyAttributes.cs
-│   │       │   │   EventFlo.EF32E471.Up2Date
-│   │       │   │   EventFlow.Application.AssemblyInfo.cs
-│   │       │   │   EventFlow.Application.AssemblyInfoInputs.cache
-│   │       │   │   EventFlow.Application.assets.cache
-│   │       │   │   EventFlow.Application.csproj.AssemblyReference.cache
-│   │       │   │   EventFlow.Application.csproj.CoreCompileInputs.cache
-│   │       │   │   EventFlow.Application.csproj.FileListAbsolute.txt
-│   │       │   │   EventFlow.Application.dll
-│   │       │   │   EventFlow.Application.GeneratedMSBuildEditorConfig.editorconfig
-│   │       │   │   EventFlow.Application.GlobalUsings.g.cs
-│   │       │   │   EventFlow.Application.pdb
-│   │       │   │   EventFlow.Application.sourcelink.json
-│   │       │   │
-│   │       │   ├───ref
-│   │       │   │       EventFlow.Application.dll
-│   │       │   │
-│   │       │   └───refint
-│   │       │           EventFlow.Application.dll
-│   │       │
-│   │       └───net8.0
-│   │           │   .NETCoreApp,Version=v8.0.AssemblyAttributes.cs
-│   │           │   EventFlow.Application.AssemblyInfo.cs
-│   │           │   EventFlow.Application.AssemblyInfoInputs.cache
-│   │           │   EventFlow.Application.GeneratedMSBuildEditorConfig.editorconfig
-│   │           │   EventFlow.Application.GlobalUsings.g.cs
-│   │           │
-│   │           └───refint
-│   ├───Services
-│   └───Validators
+│   ├───Messages
+│   │       BankResponseSimulated.cs
+│   │
+│   └───Queries
+│       ├───AuthQueries
+│       │       LoginQuery.cs
+│       │       LoginQueryHandler.cs
+│       ├───EventQueries
+│       │       GetEventQuery.cs
+│       │       GetEventQueryHandle.cs
+│       │       GetEventsListQuery.cs
+│       │       GetEventsListQueryHandler.cs
+│       │       GetMyEventsQuery.cs
+│       │       GetMyEventsQueryHandler.cs
+│       ├───OrganizerQueries
+│       │       GetAllOrganizerQuery.cs
+│       │       GetAllOrganizerQueryHandler.cs
+│       │       GetMyOrganizerQuery.cs
+│       │       GetMyOrganizerQueryHandler.cs
+│       │       GetOrganizerByIdQuery.cs
+│       │       GetOrganizerByIdQueryHandler.cs
+│       ├───PaymentQueries
+│       │       PaymentsQuery.cs
+│       │       PaymentsQueryHandler.cs
+│       │       PaymentStatusQuery.cs
+│       │       PaymentStatusQueryHandler.cs
+│       ├───RegistrationQueries
+│       │       GetEventRegistrationsQuery.cs
+│       │       GetEventRegistrationsQueryHandle.cs
+│       │       GetUserRegistrationsQuery.cs
+│       │       GetUserRegistrationsQueryHandle.cs
+│       ├───TicketQueries
+│       │       GetMyTicketsQuery.cs
+│       │       GetMyTicketsQueryHandler.cs
+│       │       GetTicketQuery.cs
+│       │       GetTicketQueryHandler.cs
+│       │       GetTicketsEventQuery.cs
+│       │       GetTicketsEventQueryHandler.cs
+│       └───UserQueries
+│               GetProfileQuery.cs
+│               GetProfileQueryHandler.cs
+│
 ├───EventFlow.Domain
 │   │   EventFlow.Domain.csproj
-│   │
-│   ├───bin
-│   │   └───Debug
-│   │       └───net10.0
-│   │               EventFlow.Domain.deps.json
-│   │               EventFlow.Domain.dll
-│   │               EventFlow.Domain.pdb
 │   │
 │   ├───Common
 │   │       BaseEntity.cs
@@ -190,136 +176,95 @@ C:.
 │   ├───Entities
 │   │       Event.cs
 │   │       Organizer.cs
+│   │       OrganizerRequest.cs
+│   │       Payment.cs
+│   │       RefreshToken.cs
 │   │       Registration.cs
+│   │       Tickets.cs
 │   │       User.cs
 │   │
 │   ├───Enums
 │   │       EventStatus.cs
 │   │       EventType.cs
+│   │       OrganizerRequestStatus.cs
+│   │       PaymentStatus.cs
 │   │       RegistrationStatus.cs
-│   │       UserRole.cs
+│   │       TicketStatus.cs
 │   │
-│   ├───Exceptions
-│   │       DomainException.cs
+│   └───Exceptions
+│           DomainException.cs
+│
+├───EventFlow.Infrastructure
+│   │   EventFlow.Infrastructure.csproj
 │   │
-│   └───obj
-│       │   EventFlow.Domain.csproj.nuget.dgspec.json
-│       │   EventFlow.Domain.csproj.nuget.g.props
-│       │   EventFlow.Domain.csproj.nuget.g.targets
-│       │   project.assets.json
-│       │   project.nuget.cache
-│       │
-│       └───Debug
-│           ├───net10.0
-│           │   │   .NETCoreApp,Version=v10.0.AssemblyAttributes.cs
-│           │   │   EventFlow.Domain.AssemblyInfo.cs
-│           │   │   EventFlow.Domain.AssemblyInfoInputs.cache
-│           │   │   EventFlow.Domain.assets.cache
-│           │   │   EventFlow.Domain.csproj.CoreCompileInputs.cache
-│           │   │   EventFlow.Domain.csproj.FileListAbsolute.txt
-│           │   │   EventFlow.Domain.dll
-│           │   │   EventFlow.Domain.GeneratedMSBuildEditorConfig.editorconfig
-│           │   │   EventFlow.Domain.GlobalUsings.g.cs
-│           │   │   EventFlow.Domain.pdb
-│           │   │   EventFlow.Domain.sourcelink.json
-│           │   │
-│           │   ├───ref
-│           │   │       EventFlow.Domain.dll
-│           │   │
-│           │   └───refint
-│           │           EventFlow.Domain.dll
-│           │
-│           └───net8.0
-│               │   .NETCoreApp,Version=v8.0.AssemblyAttributes.cs
-│               │   EventFlow.Domain.AssemblyInfo.cs
-│               │   EventFlow.Domain.AssemblyInfoInputs.cache
-│               │   EventFlow.Domain.GeneratedMSBuildEditorConfig.editorconfig
-│               │   EventFlow.Domain.GlobalUsings.g.cs
-│               │
-│               └───refint
-└───EventFlow.Infrastructure
-    │   EventFlow.Infrastructure.csproj
-    │
-    ├───bin
-    │   └───Debug
-    │       └───net10.0
-    │               EventFlow.Application.dll
-    │               EventFlow.Application.pdb
-    │               EventFlow.Domain.dll
-    │               EventFlow.Domain.pdb
-    │               EventFlow.Infrastructure.deps.json
-    │               EventFlow.Infrastructure.dll
-    │               EventFlow.Infrastructure.pdb
-    │               EventFlow.Infrastructure.runtimeconfig.json
-    │
-    ├───Configurations
-    ├───Data
-    │       ApplicationDbContext.cs
-    │
-    ├───Migrations
-    ├───obj
-    │   │   EventFlow.Infrastructure.csproj.nuget.dgspec.json
-    │   │   EventFlow.Infrastructure.csproj.nuget.g.props
-    │   │   EventFlow.Infrastructure.csproj.nuget.g.targets
-    │   │   project.assets.json
-    │   │   project.nuget.cache
-    │   │
-    │   └───Debug
-    │       └───net10.0
-    │           │   .NETCoreApp,Version=v10.0.AssemblyAttributes.cs
-    │           │   EventFlo.F1331CBB.Up2Date
-    │           │   EventFlow.Infrastructure.AssemblyInfo.cs
-    │           │   EventFlow.Infrastructure.AssemblyInfoInputs.cache
-    │           │   EventFlow.Infrastructure.assets.cache
-    │           │   EventFlow.Infrastructure.csproj.AssemblyReference.cache
-    │           │   EventFlow.Infrastructure.csproj.CoreCompileInputs.cache
-    │           │   EventFlow.Infrastructure.csproj.FileListAbsolute.txt
-    │           │   EventFlow.Infrastructure.dll
-    │           │   EventFlow.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
-    │           │   EventFlow.Infrastructure.genruntimeconfig.cache
-    │           │   EventFlow.Infrastructure.GlobalUsings.g.cs
-    │           │   EventFlow.Infrastructure.pdb
-    │           │   EventFlow.Infrastructure.sourcelink.json
-    │           │
-    │           ├───ref
-    │           │       EventFlow.Infrastructure.dll
-    │           │
-    │           └───refint
-    │                   EventFlow.Infrastructure.dll
-    │
-    ├───Repositories
-    │       BaseRepository.cs
-    │       UnitOfWork.cs
-    │
-    └───Services
-	
-
-
-
-  ЗАПОЛНЕНО ✅                                                  
-
-  Domain:        Entities (4), Enums (4), Common (1), Exceptions (1) 
-  Application:   Interfaces (7), DTOs (6)                        
-  Infrastructure: Data (1), Repositories (2)                      
-  API:           Controllers (1 - BaseController)                 
-
-
-
-  НУЖНО ЗАПОЛНИТЬ                                        
-
-  Infrastructure:                                                 
-    - Configurations (4 файла) ← КОНФИГУРАЦИИ EF CORE             
-    - Repositories (4 файла)   ← РЕАЛИЗАЦИИ РЕПОЗИТОРИЕВ          
-    - Services (2 файла)       ← ВНЕШНИЕ СЕРВИСЫ                  
-    - Migrations (авто)        ← МИГРАЦИИ БД                      
-                                                                  
-  Application:                                                    
-    - Services (4 файла)       ← БИЗНЕС-ЛОГИКА                    
-    - Validators (4 файла)     ← ВАЛИДАЦИЯ DTO                    
-    - Mappings (1 файл)        ← AUTO MAPPER ПРОФИЛИ              
-                                                                  
-  API:                                                            
-    - Controllers (4 файла)    ← REST ENDPOINTS                   
-    - Middleware (2 файла)     ← ОБРАБОТКА ОШИБОК                 
-    - Extensions (1 файл)      ← РЕГИСТРАЦИЯ DI                   
-    - Filters (1 файл)         ← ВАЛИДАЦИЯ ЗАПРОСОВ               
+│   ├───Configurations
+│   │       EventConfiguration.cs
+│   │       OrganizerConfiguration.cs
+│   │       OrganizerRequestConfiguration.cs
+│   │       PaymentConfiguration.cs
+│   │       RegistrationConfiguration.cs
+│   │       TicketsConfiguration.cs
+│   │       UserConfiguration.cs
+│   │
+│   ├───Data
+│   │       DataSeeder.cs
+│   │       EventFlowDbContext.cs
+│   │
+│   ├───Migrations
+│   │       20260803133706_InitialCreate.cs
+│   │       20260803133706_InitialCreate.Designer.cs
+│   │       20260803143913_SwitchToIdentity.cs
+│   │       20260803143913_SwitchToIdentity.Designer.cs
+│   │       20261008171303_20261008_TicketsTable.cs
+│   │       20261008171303_20261008_TicketsTable.Designer.cs
+│   │       20261008175051_20261008_PaymentTable.cs
+│   │       20261008175051_20261008_PaymentTable.Designer.cs
+│   │       20261014221549_UpdateOrganizer.cs
+│   │       20261014221549_UpdateOrganizer.Designer.cs
+│   │       20261117134047_AddOrganizerRequestTable.cs
+│   │       20261117134047_AddOrganizerRequestTable.Designer.cs
+│   │       20261117144647_AddDataToOrganizerRequest.cs
+│   │       20261117144647_AddDataToOrganizerRequest.Designer.cs
+│   │       20261117155239_RenameApprovedToReviewed.cs
+│   │       20261117155239_RenameApprovedToReviewed.Designer.cs
+│   │       20261122213310_RemoveTicketIdFromTickets.cs
+│   │       20261122213310_RemoveTicketIdFromTickets.Designer.cs
+│   │       20261122223107_RemovePaymentIdFromPayment.cs
+│   │       20261122223107_RemovePaymentIdFromPayment.Designer.cs
+│   │       EventFlowDbContextModelSnapshot.cs
+│   │
+│   ├───Repositories
+│   │       BaseRepository.cs
+│   │       EventRepository.cs
+│   │       OrganizerRepository.cs
+│   │       OrganizerRequestRepository.cs
+│   │       PaymentRepository.cs
+│   │       RegistrationRepository.cs
+│   │       TicketRepository.cs
+│   │       UnitOfWork.cs
+│   │       UserRepository.cs
+│   │
+│   └───Services
+│           EmailConfirmTokenService.cs
+│           EmailMessageService.cs
+│           EmailServiceSettings.cs
+│           JwtSettings.cs
+│           RefreshTokenService.cs
+│           Sha256TokenHasher.cs
+│           TokenService.cs
+│           ValidationService.cs
+│
+└───EventFlow.Tests
+    │   EventFlow.Tests.csproj
+    │   CancelRegistrationCommandHandlerTests.cs
+    │   ConfirmEmailCommandHandlerTests.cs
+    │   CreateEventCommandHandlerTests.cs
+    │   CreateRegistrationCommandHandlerTests.cs
+    │   GetEventQueryHandlerTests.cs
+    │   GetEventRegistrationsQueryHandlerTests.cs
+    │   GetProfileQueryHandlerTests.cs
+    │   GetUserRegistrationsQueryHandlerTests.cs
+    │   LoginQueryHandlerTests.cs
+    │   RefreshUserCommandHandlerTests.cs
+    │   RegisterUserCommandHandlerTests.cs
+    └───UpdateProfileCommandHandlerTests.cs
